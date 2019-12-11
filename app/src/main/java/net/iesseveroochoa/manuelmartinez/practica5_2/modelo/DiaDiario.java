@@ -3,8 +3,12 @@ package net.iesseveroochoa.manuelmartinez.practica5_2.modelo;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import net.iesseveroochoa.manuelmartinez.practica5_2.R;
+
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
 
 public class DiaDiario implements Parcelable {
@@ -100,12 +104,23 @@ public class DiaDiario implements Parcelable {
 
     public int getValoracionResumida(){
         if (valoracionDia<5){
-            return 1;
+            return R.drawable.sadp;
         }else if(valoracionDia>=5 && valoracionDia<=8){
-            return 2;
+            return R.drawable.neutrop;
         }else {
-            return 3;
+            return R.drawable.smilep;
         }
+    }
+
+    /**
+     * Muestra la fecha en formato local
+     * @return
+     */
+
+    public String getFechaFormatoLocal() {
+        DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM,
+                Locale.getDefault());
+        return df.format(fecha);
     }
 
     @Override

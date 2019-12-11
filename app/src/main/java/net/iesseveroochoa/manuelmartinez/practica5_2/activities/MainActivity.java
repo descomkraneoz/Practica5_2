@@ -8,9 +8,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,21 +20,31 @@ import net.iesseveroochoa.manuelmartinez.practica5_2.R;
 import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiaDiario;
 import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiarioContract;
 import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiarioDB;
+import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiarioDBAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
     //Constante para mandar datos de una actividad a otra cuando se edita o crea una nueva entrada al diario
     public final static int REQUEST_OPTION_NUEVA_ENTRADA_DIARIO = 0;
+
+    static public String TAG_ERROR="P5EjemploDB-Error:";
     //Declaracion de los distintos elementos
     Button btAcercade;
+
     //Variable que almacena la base de datos
     private DiarioDB db;
+
+    //Adaptador de la base de datos
+    DiarioDBAdapter diarioDBAdapter;
+
     //Variable para saber el orden actual en el que se mostraran los elementos en el tvPrincipal
     private String ordenActualDias;
+
     Button btAnyadir;
     Button btOrdenar;
     Button btBorrar;
-    TextView tvPrincipal;
+
+    ListView listaFragment;
 
 
     @Override
@@ -43,34 +55,21 @@ public class MainActivity extends AppCompatActivity {
         btAnyadir = findViewById(R.id.btAnyadir);
         btOrdenar = findViewById(R.id.btOrdenar);
         btBorrar = findViewById(R.id.btBorrar);
-        tvPrincipal = findViewById(R.id.tvPrincipal);
+        //tvPrincipal = findViewById(R.id.tvPrincipal);
+        listaFragment=findViewById(R.id.lvListaFragment);
 
 
-        //BASE DE DATOS, inicializamos y cargamos datos de prueba
-        try {
-            //Inicializa la base de datos
-            db = new DiarioDB(this);
-            //abre la base de datos
-            db.open();
-            //cargamos unos datos de prueba en la base de datos
-            db.cargaDatosPrueba();
 
-        } catch (android.database.sqlite.SQLiteException e) {
-            e.printStackTrace();
-        }
+
         //Ponemos un orden para mostrar los datos por defecto
         ordenActualDias = DiarioContract.DiaDiarioEntries.FECHA;
         //Lo mostramos
-        mostrarDias();
+        //mostrarDias();
+        iniciaDatosListaFragment();
 
     }
 
-    //Sobreescribimos el metodo onDestroy para que cierre la base de datos cuando se cierre la aplicacion
-    @Override
-    protected void onDestroy() {
-        db.close();
-        super.onDestroy();
-    }
+
 
     /**
      * @param menu, para poder mostrar el menu de la aplicacion hace falta inflarlo antes tal que asi.
@@ -133,14 +132,14 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.btOrdenar:
                 //Llama al metodo para ordenar según unos parámetros
-                dialogoOrdenarPor();
+                //dialogoOrdenarPor();
                 break;
             case R.id.btBorrar:
                 //Llama al metodo para borrar el primer dia
-                borrarPrimerDia();
+               // borrarPrimerDia();
                 break;
             case R.id.btValorarVida:
-                this.valorarVidaDialog();
+                //this.valorarVidaDialog();
                 break;
             case R.id.btMostrarDesdeHasta:
                 Toast.makeText(getApplicationContext(), getResources().getText(R.string.tmMensajeERROR), Toast.LENGTH_LONG).show();
@@ -153,55 +152,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Metodo para mostrar en el textview del MainActivity los datos de la base de datos
+     * Carga el adaptador
      */
+    private void iniciaDatosListaFragment(){
+        try {
+            //Cursor c=listaFragment.obtenDiario(ordenActualDias);
+            //diarioDBAdapter=new DiarioDBAdapter(this,c);
+            listaFragment.setAdapter(diarioDBAdapter);
 
-    private void mostrarDias() {
-        //Obtenemos un cursor el cual esta ordenado por el orden que hay por defecto
-        Cursor c = db.obtenDiario(ordenActualDias);
-        //Almacenamos el dia
-        DiaDiario dia;
-        //limpiamos el campo de texto
-        tvPrincipal.setText("");
-        //Nos aseguramos de que existe al menos un registro
-        if (c.moveToFirst()) {
-            //Recorremos el cursor hasta que no haya más registros
-            do {
-                dia = DiarioDB.deCursorADia(c);
-                //podéis sobrecargar toString en DiaDiario para mostrar los datos
-                //tvPrincipal.append(dia.toString() + "\n");
-                tvPrincipal.append(dia.mostrarDatosBonitos() + "\n");
-            } while (c.moveToNext());
+        }catch (android.database.sqlite.SQLiteException e){
+            mostrarMensajeError(e);
         }
     }
 
-    /**
-     * Metodo para mostrar en el textview del MainActivity los datos de la base de datos
-     * en funcion a un orden que me pasan por parametro
-     */
-
-    private void mostrarDias(String ordenadoPor) {
-        //Obtenemos un cursor el cual esta ordenado por el orden que me pasan
-        Cursor c = db.obtenDiario(ordenadoPor);
-        //Almacenamos el dia
-        DiaDiario dia;
-        //limpiamos el campo de texto
-        tvPrincipal.setText("");
-        //Nos aseguramos de que existe al menos un registro
-        if (c.moveToFirst()) {
-            //Recorremos el cursor hasta que no haya más registros
-            do {
-                dia = DiarioDB.deCursorADia(c);
-                //podéis sobrecargar toString en DiaDiario para mostrar los datos
-                //tvPrincipal.append(dia.toString() + "\n");
-                tvPrincipal.append(dia.mostrarDatosBonitos() + "\n");
-            } while (c.moveToNext());
-        }
+    private void mostrarMensajeError(Exception e) {
+        Log.e(TAG_ERROR,e.getMessage());
+        Toast.makeText(this, getString(R.string.errorLeerBD)+": "+e.getMessage(),Toast.LENGTH_LONG).show();
     }
 
     /**
+
+
      * Metodo para borrar dias del diario
-     */
+
 
     private void borrarPrimerDia() {
         //Obtenemos un cursor el cual esta ordenado por el orden que hay actualmente
@@ -216,9 +189,9 @@ public class MainActivity extends AppCompatActivity {
         mostrarDias(DiarioContract.DiaDiarioEntries.FECHA);
     }
 
-    /**
+
      * Metodo para ordenar dias del diario
-     */
+
 
     private void dialogoOrdenarPor() {
 
@@ -253,9 +226,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /**
+
      * Método que genera un dialogo el cual muestra la media de la puntuacion de los días que hay en la base de datos
-     */
+
     private void valorarVidaDialog() {
         //Creamos un mensaje de alerta para informar al usuario
         AlertDialog.Builder dialogo = new AlertDialog.Builder(this);
@@ -274,9 +247,9 @@ public class MainActivity extends AppCompatActivity {
         dialogo.show();
     }
 
-    /**
+
      * Método que se ejecuta cuando se vuelve de una actividad iniciada con startActivityForResult
-     */
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -295,5 +268,78 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    */
+
+    /**
+     * //BASE DE DATOS, inicializamos y cargamos datos de prueba
+     *         try {
+     *             //Inicializa la base de datos
+     *             db = new DiarioDB(this);
+     *             //abre la base de datos
+     *             db.open();
+     *             //cargamos unos datos de prueba en la base de datos
+     *             db.cargaDatosPrueba();
+     *
+     *         } catch (android.database.sqlite.SQLiteException e) {
+     *             e.printStackTrace();
+     *         }
+     *
+     *         //Sobreescribimos el metodo onDestroy para que cierre la base de datos cuando se cierre la aplicacion
+     *     @Override
+     *     protected void onDestroy() {
+     *         db.close();
+     *         super.onDestroy();
+     *     }
+     */
+
+    /**
+     * Metodo para mostrar en el textview del MainActivity los datos de la base de datos
+
+
+     private void mostrarDias() {
+     //Obtenemos un cursor el cual esta ordenado por el orden que hay por defecto
+     Cursor c = db.obtenDiario(ordenActualDias);
+     //Almacenamos el dia
+     DiaDiario dia;
+     //limpiamos el campo de texto
+     tvPrincipal.setText("");
+     //Nos aseguramos de que existe al menos un registro
+     if (c.moveToFirst()) {
+     //Recorremos el cursor hasta que no haya más registros
+     do {
+     dia = DiarioDB.deCursorADia(c);
+     //podéis sobrecargar toString en DiaDiario para mostrar los datos
+     //tvPrincipal.append(dia.toString() + "\n");
+     tvPrincipal.append(dia.mostrarDatosBonitos() + "\n");
+     } while (c.moveToNext());
+     }
+     }
+
+
+     * Metodo para mostrar en el textview del MainActivity los datos de la base de datos
+     * en funcion a un orden que me pasan por parametro
+
+
+     private void mostrarDias(String ordenadoPor) {
+     //Obtenemos un cursor el cual esta ordenado por el orden que me pasan
+     Cursor c = db.obtenDiario(ordenadoPor);
+     //Almacenamos el dia
+     DiaDiario dia;
+     //limpiamos el campo de texto
+     tvPrincipal.setText("");
+     //Nos aseguramos de que existe al menos un registro
+     if (c.moveToFirst()) {
+     //Recorremos el cursor hasta que no haya más registros
+     do {
+     dia = DiarioDB.deCursorADia(c);
+     //podéis sobrecargar toString en DiaDiario para mostrar los datos
+     //tvPrincipal.append(dia.toString() + "\n");
+     tvPrincipal.append(dia.mostrarDatosBonitos() + "\n");
+     } while (c.moveToNext());
+     }
+     }
+
+     */
 
 }

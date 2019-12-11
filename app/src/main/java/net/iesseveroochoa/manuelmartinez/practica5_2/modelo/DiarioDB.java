@@ -187,6 +187,7 @@ public class DiarioDB {
                 ordenadoPor + " DESC");
     }
 
+
     /**
      * Metodo que inserta en la base de datos los siguientes datos
      */

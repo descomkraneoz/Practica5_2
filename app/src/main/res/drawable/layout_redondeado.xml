@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--color de fondo: 00 significa transparente-->
+    <solid android:color="#FFFFFFFF" />
+    <!--ancho y color del borde-->
+    <stroke
+        android:width="3dp"
+        android:color="#B1BCBE" />
+    <!--radio de las esquinas-->
+    <corners android:radius="10dp" />
+    <padding
+        android:bottom="0dip"
+        android:left="0dp"
+        android:right="0dip"
+        android:top="0dip" />
+</shape>

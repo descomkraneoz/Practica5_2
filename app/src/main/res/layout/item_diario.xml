@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/lyt_Item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/layout_redondeado">
+
+    <ImageView
+        android:id="@+id/ivIconoItemDiario"
+        android:layout_width="53dp"
+        android:layout_height="43dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/neutrop" />
+
+    <TextView
+        android:id="@+id/tvResumenItemDiario"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:capitalize="characters"
+        android:fontFamily="sans-serif-black"
+        android:lines="@integer/maxLineas"
+        android:maxLines="@integer/maxLineas"
+        android:textAlignment="textStart"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ivIconoItemDiario"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="DB_EXAMEN DE MATES" />
+
+    <TextView
+        android:id="@+id/tvFechaItemDiario"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ivIconoItemDiario"
+        app:layout_constraintTop_toBottomOf="@+id/tvResumenItemDiario"
+        tools:text="Mar 12, 2012" />
+</androidx.constraintlayout.widget.ConstraintLayout>
