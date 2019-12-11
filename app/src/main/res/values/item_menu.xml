@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="item_menu">
+        <item>FECHA</item>
+        <item>VALORACION</item>
+        <item>RESUMEN</item>
+    </string-array>
+
+
+</resources>
