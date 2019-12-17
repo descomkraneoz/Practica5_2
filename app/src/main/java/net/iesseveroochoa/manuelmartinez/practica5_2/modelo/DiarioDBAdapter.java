@@ -16,6 +16,7 @@ import net.iesseveroochoa.manuelmartinez.practica5_2.R;
 public class DiarioDBAdapter extends CursorAdapter {
 
     protected Cursor c;
+    protected DiarioDB db;
 
     public DiarioDBAdapter(Context context, Cursor cursor){
         super(context,cursor,0);
@@ -50,6 +51,7 @@ public class DiarioDBAdapter extends CursorAdapter {
         TextView tvResumenItemDiario = view.findViewById(R.id.tvResumenItemDiario);
         TextView tvFechaItemDiario = view.findViewById(R.id.tvFechaItemDiario);
 
+        //layout contenedor del item_diario
         ConstraintLayout lytItem = (ConstraintLayout) view.findViewById(R.id.lyt_Item);
 
         if ((cursor.getPosition() % 2 == 0)) {
@@ -88,6 +90,23 @@ public class DiarioDBAdapter extends CursorAdapter {
             return -1;
         }
     }
+
+    /**
+     * Crea un dia en la base de datos
+     */
+    public void addDia(DiaDiario dia) {
+        db.insertaDia(dia);
+        this.notifyDataSetChanged();
+    }
+
+    /**
+     * Borra un dia en la base de datos
+     */
+    public void delDia(int pos) {
+        db.borraDia(diaPosicion(pos));
+        notifyDataSetChanged();
+    }
+
 
 
 }
