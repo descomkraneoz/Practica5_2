@@ -1,24 +1,19 @@
 package net.iesseveroochoa.manuelmartinez.practica5_2.activities;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import net.iesseveroochoa.manuelmartinez.practica5_2.R;
-import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiaDiario;
-import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiarioContract;
 import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiarioDB;
 import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiarioDBAdapter;
 
@@ -62,10 +57,10 @@ public class MainActivity extends AppCompatActivity {
 
 
         //Ponemos un orden para mostrar los datos por defecto
-        ordenActualDias = DiarioContract.DiaDiarioEntries.FECHA;
+        //ordenActualDias = DiarioContract.DiaDiarioEntries.FECHA;
         //Lo mostramos
         //mostrarDias();
-        iniciaDatosListaFragment();
+        // iniciaDatosListaFragment();
 
     }
 
@@ -139,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                // borrarPrimerDia();
                 break;
             case R.id.btValorarVida:
-                //this.valorarVidaDialog();
+
                 break;
             case R.id.btMostrarDesdeHasta:
                 Toast.makeText(getApplicationContext(), getResources().getText(R.string.tmMensajeERROR), Toast.LENGTH_LONG).show();
@@ -151,10 +146,11 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
     /**
      * Carga el adaptador
-     */
-    private void iniciaDatosListaFragment(){
+
+     private void iniciaDatosListaFragment(){
         try {
             //Cursor c=listaFragment.obtenDiario(ordenActualDias);
             //diarioDBAdapter=new DiarioDBAdapter(this,c);
@@ -163,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
         }catch (android.database.sqlite.SQLiteException e){
             mostrarMensajeError(e);
         }
-    }
+     }*/
 
     private void mostrarMensajeError(Exception e) {
         Log.e(TAG_ERROR,e.getMessage());

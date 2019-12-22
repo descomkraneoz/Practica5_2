@@ -1,6 +1,7 @@
 package net.iesseveroochoa.manuelmartinez.practica5_2.fragments;
 
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,11 +24,13 @@ import java.util.Date;
  */
 public class ListaFragment extends Fragment {
 
-    DiarioDB db;
-    ListView lvListaFragment;
-    DiarioDBAdapter dDBadapter;
+    private DiarioDB db;
+    private ListView lvListaFragment;
+    private DiarioDBAdapter dDBadapter;
     //contiene una referencia al listener del evento de seleccion de dia
     private OnListaDiarioListener listaDiariosListener;
+    //nos permite conocer el orden en el que tenemos la lista
+    private String ordenActualDias;
 
 
 
@@ -46,7 +49,7 @@ public class ListaFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        //Hacemos a los datos que se quieran guardar sean miembros de la clase
+        //Hacemos a los datos que se quieran guardar sean miembros de la clase por si hay giros de pantalla
         setRetainInstance(true);
 
         lvListaFragment = getView().findViewById(R.id.lvListaFragment);
@@ -68,15 +71,23 @@ public class ListaFragment extends Fragment {
         if (lvListaFragment == null) {
             cargaDatosPrueba();
         }
-        dDBadapter = new DiarioDBAdapter(getContext(), db.obtenDiario(DiarioContract.DiaDiarioEntries.FECHA));
+        //ponemos un orden a como mostrar los dias
+        ordenActualDias = DiarioContract.DiaDiarioEntries.FECHA;
+        dDBadapter = new DiarioDBAdapter(getContext(), db.obtenDiario(ordenActualDias));
         lvListaFragment.setAdapter(dDBadapter);
 
-        //en caso de click sobre un correo, delegamos a la actividad que tiene que hacer
+        //en caso de click sobre un dia, delegamos a la actividad que tiene que hacer
         lvListaFragment.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                listaDiariosListener.onDiarioSeleccionado((DiaDiario) dDBadapter.getItem(i));
+                if (listaDiariosListener != null) {
+                    //pasar dia seleccionado
+                    Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);
+                    DiaDiario dia = DiarioDB.deCursorADia(cursor);
+                    //llamamos al metodo implemtado en la actividad
+                    listaDiariosListener.onDiarioSeleccionado(dia);
+                }
+                //listaDiariosListener.onDiarioSeleccionado((DiaDiario) dDBadapter.getItem(i));
             }
         });
 
@@ -140,6 +151,13 @@ public class ListaFragment extends Fragment {
      */
     public interface OnListaDiarioListener {
         void onDiarioSeleccionado(DiaDiario dia);
+    }
+
+    /**
+     * Nos permite ordenar por fecha el adaptador
+     */
+    public void ordenaPorFecha() {
+
     }
 
 
