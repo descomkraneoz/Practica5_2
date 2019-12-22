@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import net.iesseveroochoa.manuelmartinez.practica5_2.R;
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Constante para mandar datos de una actividad a otra cuando se edita o crea una nueva entrada al diario
     public final static int REQUEST_OPTION_NUEVA_ENTRADA_DIARIO = 0;
+    public final static int REQUEST_OPTION_VER_ENTRADA_DIARIO = 1;
 
 
     static public String TAG_ERROR="P5EjemploDB-Error:";
@@ -58,14 +60,24 @@ public class MainActivity extends AppCompatActivity {
                 // } else {
                 //si es pantalla pequeña, mostramos el correo en
                 //la actividad correspondiente
-                Intent i = new Intent(MainActivity.this, VerDiaActivity.class);
-                i.putExtra(VerDiaActivity.EXTRA_DIA, dia);
-                startActivity(i);
+                mostrarDiaPantallaPeque(dia);
                 //}
 
             }
         });
     }
+
+    /**
+     * Metodo para pantalla pequeña que muestra un correo seleccionado
+     */
+    public void mostrarDiaPantallaPeque(DiaDiario dia) {
+        //creamos un intent y le pasamos la actividad que llama a la actividad que recibe
+        Intent i = new Intent(MainActivity.this, VerDiaActivity.class);
+        i.putExtra(VerDiaActivity.EXTRA_DIA, dia);
+        //iniciamos el intent y el pasamos una constante para guardar/enviar los datos
+        startActivityForResult(i, REQUEST_OPTION_NUEVA_ENTRADA_DIARIO);
+    }
+
 
 
 
@@ -130,14 +142,14 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.btOrdenar:
                 //Llama al metodo para ordenar según unos parámetros
-                //dialogoOrdenarPor();
+                listaFragment.dialogoOrdenarPor();
                 break;
             case R.id.btBorrar:
                 //Llama al metodo para borrar el primer dia
                // borrarPrimerDia();
                 break;
             case R.id.btValorarVida:
-
+                listaFragment.valorarVidaDialog();
                 break;
             case R.id.btMostrarDesdeHasta:
                 Toast.makeText(getApplicationContext(), getResources().getText(R.string.tmMensajeERROR), Toast.LENGTH_LONG).show();
@@ -149,24 +161,38 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
-    /**
-     * Carga el adaptador
-
-     private void iniciaDatosListaFragment(){
-        try {
-            //Cursor c=listaFragment.obtenDiario(ordenActualDias);
-            //diarioDBAdapter=new DiarioDBAdapter(this,c);
-            listaFragment.setAdapter(diarioDBAdapter);
-
-        }catch (android.database.sqlite.SQLiteException e){
-            mostrarMensajeError(e);
-        }
-     }*/
-
     private void mostrarMensajeError(Exception e) {
         Log.e(TAG_ERROR,e.getMessage());
         Toast.makeText(this, getString(R.string.errorLeerBD)+": "+e.getMessage(),Toast.LENGTH_LONG).show();
+    }
+
+    /**
+     * Método que se ejecuta cuando se vuelve de una actividad iniciada con startActivityForResult
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //Miramos que el resultado devuelto sea correcto y que el código de solicitud sea el de añadir una nueva actividad
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_OPTION_NUEVA_ENTRADA_DIARIO:
+                    //recuperamos los datos de la otra actividad y los guardamos en un objeto DiaDiario
+                    DiaDiario p = data.getParcelableExtra(EdicionDiaActivity.EXTRA_DIA_A_GUARDAR);
+                    //Guardamos en la base de datos el objeto recuperado
+                    listaFragment.addDia(p);
+                    //Usamos el metodo mostrarDias para enseñar la base de datos con todos los datos
+                    listaFragment.dialogoOrdenarPor();
+                    break;
+                case REQUEST_OPTION_VER_ENTRADA_DIARIO:
+                    //recuperamos los datos de la otra actividad y los guardamos en un objeto DiaDiario
+                    DiaDiario dia = data.getParcelableExtra(VerDiaActivity.EXTRA_DIA);
+                    //Guardamos en la base de datos el objeto recuperado
+                    listaFragment.addDia(dia);
+                    //Usamos el metodo mostrarDias para enseñar la base de datos con todos los datos
+                    listaFragment.dialogoOrdenarPor();
+                    break;
+            }
+        }
     }
 
     /**
@@ -189,108 +215,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-     * Metodo para ordenar dias del diario
 
 
-    private void dialogoOrdenarPor() {
 
-        //array de elementos
-        final CharSequence[] itemsDialogo = getResources().getStringArray(R.array.item_menu);
-
-        AlertDialog.Builder dialogo = new AlertDialog.Builder(MainActivity.this);
-        dialogo.setTitle(getResources().getString(R.string.ordenarPor));
-        dialogo.setItems(itemsDialogo, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                switch (item) {
-                    case 0:
-                        mostrarDias(DiarioContract.DiaDiarioEntries.FECHA);
-                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.ordenarPorFecha),
-                                Toast.LENGTH_LONG).show();
-                        break;
-                    case 1:
-                        mostrarDias(DiarioContract.DiaDiarioEntries.VALORACION);
-                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.ordenarPorValoracion),
-                                Toast.LENGTH_LONG).show();
-                        break;
-                    case 2:
-                        mostrarDias(DiarioContract.DiaDiarioEntries.RESUMEN);
-                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.ordenarPorResumen),
-                                Toast.LENGTH_LONG).show();
-                        break;
-                }
-                dialog.dismiss();
-            }
-        }).show();
-
-    }
-
-
-     * Método que genera un dialogo el cual muestra la media de la puntuacion de los días que hay en la base de datos
-
-    private void valorarVidaDialog() {
-        //Creamos un mensaje de alerta para informar al usuario
-        AlertDialog.Builder dialogo = new AlertDialog.Builder(this);
-        //Establecemos el título y el mensaje que queremos
-        dialogo.setTitle(getResources().getString(R.string.TituloValorarVida));
-        dialogo.setMessage(getResources().getString(R.string.mensajeValoraVida) + " " + db.valoraVida());
-        // agregamos botón de aceptar al dialogo
-        dialogo.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //Cuando hagan click en el boton saldremos automaticamente,de la misma forma que si pulsa fuera del cuadro de dialogo
-                onRestart();
-            }
-        });
-        //Mostramos el dialogo
-        dialogo.show();
-    }
-
-
-     * Método que se ejecuta cuando se vuelve de una actividad iniciada con startActivityForResult
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        //Miramos que el resultado devuelto sea correcto y que el código de solicitud sea el de añadir una nueva actividad
-        if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case REQUEST_OPTION_NUEVA_ENTRADA_DIARIO:
-                    //recuperamos los datos de la otra actividad y los guardamos en un objeto DiaDiario
-                    DiaDiario p = data.getParcelableExtra(EdicionDiaActivity.EXTRA_DIA_A_GUARDAR);
-                    //Guardamos en la base de datos el objeto recuperado
-                    db.insertaDia(p);
-                    //Usamos el metodo mostrarDias para enseñar la base de datos con todos los datos
-                    mostrarDias();
-                    break;
-            }
-        }
-    }
 
     */
 
-    /**
-     * //BASE DE DATOS, inicializamos y cargamos datos de prueba
-     *         try {
-     *             //Inicializa la base de datos
-     *             db = new DiarioDB(this);
-     *             //abre la base de datos
-     *             db.open();
-     *             //cargamos unos datos de prueba en la base de datos
-     *             db.cargaDatosPrueba();
-     *
-     *         } catch (android.database.sqlite.SQLiteException e) {
-     *             e.printStackTrace();
-     *         }
-     *
-     *         //Sobreescribimos el metodo onDestroy para que cierre la base de datos cuando se cierre la aplicacion
-     *     @Override
-     *     protected void onDestroy() {
-     *         db.close();
-     *         super.onDestroy();
-     *     }
-     */
 
     /**
      * Metodo para mostrar en el textview del MainActivity los datos de la base de datos

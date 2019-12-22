@@ -1,6 +1,8 @@
 package net.iesseveroochoa.manuelmartinez.practica5_2.fragments;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -53,7 +56,40 @@ public class ListaFragment extends Fragment {
         setRetainInstance(true);
 
         lvListaFragment = getView().findViewById(R.id.lvListaFragment);
+        //abrimos la base de datos
+        iniciaBaseDatos();
 
+        //si no venimos de una reconstrucción
+        if (lvListaFragment == null) {
+            cargaDatosPrueba();
+        }
+        //mostramos los dias ordenador por fecha
+        ordenaPorFecha();
+
+
+        //en caso de click sobre un dia, delegamos a la actividad que tiene que hacer
+        lvListaFragment.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if (listaDiariosListener != null) {
+                    //pasar dia seleccionado
+                    Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);
+                    DiaDiario dia = DiarioDB.deCursorADia(cursor);
+                    //llamamos al metodo implementado en la actividad
+                    listaDiariosListener.onDiarioSeleccionado(dia);
+
+                }
+            }
+        });
+
+
+    }
+
+    /**
+     * Metodo para Abrir la BAse de datos, tb podemos cargar datos de muestra aunque no lo haremos aquí
+     */
+
+    public void iniciaBaseDatos() {
         //BASE DE DATOS, inicializamos y cargamos datos de prueba
         try {
             //Inicializa la base de datos
@@ -66,32 +102,6 @@ public class ListaFragment extends Fragment {
         } catch (android.database.sqlite.SQLiteException e) {
             e.printStackTrace();
         }
-
-        //si no venimos de una reconstrucción
-        if (lvListaFragment == null) {
-            cargaDatosPrueba();
-        }
-        //ponemos un orden a como mostrar los dias
-        ordenActualDias = DiarioContract.DiaDiarioEntries.FECHA;
-        dDBadapter = new DiarioDBAdapter(getContext(), db.obtenDiario(ordenActualDias));
-        lvListaFragment.setAdapter(dDBadapter);
-
-        //en caso de click sobre un dia, delegamos a la actividad que tiene que hacer
-        lvListaFragment.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if (listaDiariosListener != null) {
-                    //pasar dia seleccionado
-                    Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);
-                    DiaDiario dia = DiarioDB.deCursorADia(cursor);
-                    //llamamos al metodo implemtado en la actividad
-                    listaDiariosListener.onDiarioSeleccionado(dia);
-                }
-                //listaDiariosListener.onDiarioSeleccionado((DiaDiario) dDBadapter.getItem(i));
-            }
-        });
-
-
     }
     /**
      * Metodo que inserta en la base de datos los siguientes datos
@@ -134,7 +144,7 @@ public class ListaFragment extends Fragment {
      * @param dia
      */
     public void addDia(DiaDiario dia) {
-        dDBadapter.addDia(dia);
+        dDBadapter.agregaDiaBD(dia);
     }
 
     /**
@@ -143,7 +153,7 @@ public class ListaFragment extends Fragment {
      * @param pos
      */
     public void delDia(int pos) {
-        dDBadapter.delDia(pos);
+        dDBadapter.borraDiaBD(pos);
     }
 
     /**
@@ -154,10 +164,79 @@ public class ListaFragment extends Fragment {
     }
 
     /**
-     * Nos permite ordenar por fecha el adaptador
+     * Nos permite ordenar y mostrar por fecha el adaptador
      */
     public void ordenaPorFecha() {
+        ordenActualDias = DiarioContract.DiaDiarioEntries.FECHA;
+        dDBadapter = new DiarioDBAdapter(getContext(), db.obtenDiario(ordenActualDias));
+        lvListaFragment.setAdapter(dDBadapter);
+    }
 
+    /**
+     * Nos permite ordenar y mostrar el adaptador
+     */
+    public void ordenaPor(String orden) {
+        ordenActualDias = orden;
+        dDBadapter = new DiarioDBAdapter(getContext(), db.obtenDiario(ordenActualDias));
+        lvListaFragment.setAdapter(dDBadapter);
+    }
+
+    /**
+     * Nos permite ordenar y mostrar por fecha el adaptador
+     */
+    public void dialogoOrdenarPor() {
+
+        //array de elementos
+        final CharSequence[] itemsDialogo = getResources().getStringArray(R.array.item_menu);
+
+        AlertDialog.Builder dialogo = new AlertDialog.Builder(getContext());
+        dialogo.setTitle(getResources().getString(R.string.ordenarPor));
+        dialogo.setItems(itemsDialogo, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                switch (item) {
+                    case 0:
+                        ordenaPor(DiarioContract.DiaDiarioEntries.FECHA);
+                        Toast.makeText(getContext(), getResources().getString(R.string.ordenarPorFecha),
+                                Toast.LENGTH_LONG).show();
+                        break;
+                    case 1:
+                        ordenaPor(DiarioContract.DiaDiarioEntries.VALORACION);
+                        Toast.makeText(getContext(), getResources().getString(R.string.ordenarPorValoracion),
+                                Toast.LENGTH_LONG).show();
+                        break;
+                    case 2:
+                        ordenaPor(DiarioContract.DiaDiarioEntries.RESUMEN);
+                        Toast.makeText(getContext(), getResources().getString(R.string.ordenarPorResumen),
+                                Toast.LENGTH_LONG).show();
+                        break;
+                }
+                dialog.dismiss();
+            }
+        }).show();
+
+    }
+
+    /**
+     * Método que genera un dialogo el cual muestra la media de la puntuacion de los días que hay en la base de datos
+     */
+
+    public void valorarVidaDialog() {
+        //Creamos un mensaje de alerta para informar al usuario
+        AlertDialog.Builder dialogo = new AlertDialog.Builder(getContext());
+        //Establecemos el título y el mensaje que queremos
+        dialogo.setTitle(getResources().getString(R.string.TituloValorarVida));
+        dialogo.setMessage(getResources().getString(R.string.mensajeValoraVida) + " " + db.valoraVida());
+        // agregamos botón de aceptar al dialogo
+        dialogo.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //Cuando hagan click en el boton saldremos automaticamente,de la misma forma que si pulsa fuera del cuadro de dialogo
+                getExitTransition();
+            }
+        });
+        //Mostramos el dialogo
+        dialogo.show();
     }
 
 

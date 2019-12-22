@@ -46,6 +46,9 @@ public class DiaFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_dia, container, false);
+        //indicamos que retenga los valores ante reconstrucciones
+        //esto es una ventaja importante respecto a las actividades
+        this.setRetainInstance(true);
         return view;
     }
 
@@ -57,9 +60,7 @@ public class DiaFragment extends Fragment {
         tvValoracionDiaFragment.findViewById(R.id.tvValoracionDiaFragment);
         tvNumeroDiaFragment.findViewById(R.id.tvNumeroDiaFragment);
         tvTextoDiaFragment.findViewById(R.id.tvTextoDiaFragment);
-        //indicamos que retenga los valores ante reconstrucciones
-        //esto es una ventaja importante respecto a las actividades
-        this.setRetainInstance(true);
+
 
         if (getArguments() != null) {
             //si estamos creando el fragment de forma dinámica y tenemos

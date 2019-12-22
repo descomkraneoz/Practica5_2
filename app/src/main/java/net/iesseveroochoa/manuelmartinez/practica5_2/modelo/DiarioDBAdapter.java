@@ -94,7 +94,7 @@ public class DiarioDBAdapter extends CursorAdapter {
     /**
      * Crea un dia en la base de datos
      */
-    public void addDia(DiaDiario dia) {
+    public void agregaDiaBD(DiaDiario dia) {
         db.insertaDia(dia);
         this.notifyDataSetChanged();
     }
@@ -102,7 +102,7 @@ public class DiarioDBAdapter extends CursorAdapter {
     /**
      * Borra un dia en la base de datos
      */
-    public void delDia(int pos) {
+    public void borraDiaBD(int pos) {
         db.borraDia(diaPosicion(pos));
         notifyDataSetChanged();
     }
