@@ -8,7 +8,7 @@
     tools:context=".activities.MainActivity">
 
     <fragment
-        android:id="@+id/fragment"
+        android:id="@+id/frMain"
         android:name="net.iesseveroochoa.manuelmartinez.practica5_2.fragments.ListaFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

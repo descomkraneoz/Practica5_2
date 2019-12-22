@@ -44,25 +44,26 @@ public class DiaFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        tvFechaDiaFragment.findViewById(R.id.tvFechaDiaFragment);
-        tvResumenDiaFragment.findViewById(R.id.tvResumenDiaFragment);
-        tvValoracionDiaFragment.findViewById(R.id.tvValoracionDiaFragment);
-        tvNumeroDiaFragment.findViewById(R.id.tvNumeroDiaFragment);
-        tvTextoDiaFragment.findViewById(R.id.tvTextoDiaFragment);
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_dia, container, false);
-        //indicamos que retenga los valores ante reconstrucciones
-        //esto es una ventaja importante respecto a las actividades
-        this.setRetainInstance(true);
         return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        tvFechaDiaFragment.findViewById(R.id.tvFechaDiaFragment);
+        tvResumenDiaFragment.findViewById(R.id.tvResumenDiaFragment);
+        tvValoracionDiaFragment.findViewById(R.id.tvValoracionDiaFragment);
+        tvNumeroDiaFragment.findViewById(R.id.tvNumeroDiaFragment);
+        tvTextoDiaFragment.findViewById(R.id.tvTextoDiaFragment);
+        //indicamos que retenga los valores ante reconstrucciones
+        //esto es una ventaja importante respecto a las actividades
+        this.setRetainInstance(true);
+
         if (getArguments() != null) {
             //si estamos creando el fragment de forma dinámica y tenemos
-            //argumentos lo mostramo
+            //argumentos lo mostramos
             diaDiario = getArguments().getParcelable(ARG_DIA);
         } else {
             //si estamos creandolo de forma estática mostramos datos temporales
@@ -74,6 +75,7 @@ public class DiaFragment extends Fragment {
     private void visualizaDia() {
         tvFechaDiaFragment.setText(diaDiario.getFechaFormatoLocal());
         tvResumenDiaFragment.setText(diaDiario.getResumen());
+        tvValoracionDiaFragment.setText(getResources().getString(R.string.valoracion));
         tvNumeroDiaFragment.setText(diaDiario.getValoracionDia());
         tvTextoDiaFragment.setText(diaDiario.getContenido());
     }

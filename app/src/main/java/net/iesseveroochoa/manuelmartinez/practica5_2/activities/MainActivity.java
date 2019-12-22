@@ -8,38 +8,30 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import net.iesseveroochoa.manuelmartinez.practica5_2.R;
-import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiarioDB;
-import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiarioDBAdapter;
+import net.iesseveroochoa.manuelmartinez.practica5_2.fragments.ListaFragment;
+import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiaDiario;
 
 public class MainActivity extends AppCompatActivity {
 
     //Constante para mandar datos de una actividad a otra cuando se edita o crea una nueva entrada al diario
     public final static int REQUEST_OPTION_NUEVA_ENTRADA_DIARIO = 0;
 
+
     static public String TAG_ERROR="P5EjemploDB-Error:";
     //Declaracion de los distintos elementos
     Button btAcercade;
-
-    //Variable que almacena la base de datos
-    private DiarioDB db;
-
-    //Adaptador de la base de datos
-    DiarioDBAdapter diarioDBAdapter;
-
-    //Variable para saber el orden actual en el que se mostraran los elementos en el tvPrincipal
-    private String ordenActualDias;
-
     Button btAnyadir;
     Button btOrdenar;
     Button btBorrar;
 
-    ListView listaFragment;
+    ListaFragment listaFragment;
+
+
 
 
     @Override
@@ -50,18 +42,29 @@ public class MainActivity extends AppCompatActivity {
         btAnyadir = findViewById(R.id.btAnyadir);
         btOrdenar = findViewById(R.id.btOrdenar);
         btBorrar = findViewById(R.id.btBorrar);
-        //tvPrincipal = findViewById(R.id.tvPrincipal);
-        listaFragment=findViewById(R.id.lvListaFragment);
 
+        //buscamos el fragment que contiene la lista
+        listaFragment = (ListaFragment) getSupportFragmentManager().findFragmentById(R.id.frMain);
 
+        //Asignamos el evento de seleccion de correo
+        listaFragment.setOnListaDiarioListener(new ListaFragment.OnListaDiarioListener() {
+            @Override
+            public void onDiarioSeleccionado(DiaDiario dia) {
 
+                //if (esPantallaGrande) {
+                //creamos el fragmento de forma dinámica
+                //   crearFragment(correo);
 
-        //Ponemos un orden para mostrar los datos por defecto
-        //ordenActualDias = DiarioContract.DiaDiarioEntries.FECHA;
-        //Lo mostramos
-        //mostrarDias();
-        // iniciaDatosListaFragment();
+                // } else {
+                //si es pantalla pequeña, mostramos el correo en
+                //la actividad correspondiente
+                Intent i = new Intent(MainActivity.this, VerDiaActivity.class);
+                i.putExtra(VerDiaActivity.EXTRA_DIA, dia);
+                startActivity(i);
+                //}
 
+            }
+        });
     }
 
 
