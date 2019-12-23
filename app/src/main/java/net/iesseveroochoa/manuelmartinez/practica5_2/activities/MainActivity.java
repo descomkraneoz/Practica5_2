@@ -5,17 +5,22 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import net.iesseveroochoa.manuelmartinez.practica5_2.R;
+import net.iesseveroochoa.manuelmartinez.practica5_2.fragments.DiaFragment;
 import net.iesseveroochoa.manuelmartinez.practica5_2.fragments.ListaFragment;
 import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiaDiario;
 import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiarioContract;
@@ -28,25 +33,27 @@ public class MainActivity extends AppCompatActivity {
     public final static int REQUEST_OPTION_NUEVA_ENTRADA_DIARIO = 0;
     public final static int REQUEST_OPTION_VER_ENTRADA_DIARIO = 1;
 
-
-    static public String TAG_ERROR="P5EjemploDB-Error:";
     //Declaracion de los distintos elementos
     Button btAcercade;
     Button btAnyadir;
     Button btOrdenar;
     Button btBorrar;
-
+    TextView tvSinDia;
+    //fragmento detalle de dia
+    DiaFragment diaFragmentDinamico;
+    //fragmento contenedor para tablet de dia
+    FrameLayout frameContenedorDinamico;
+    //el fragment que se va a mostrar con la lista
     ListaFragment listaFragment;
-
-    //nos permite conocer el orden en el que tenemos la lista
+    //bandera para saber en que tipo de pantalla estamos
+    private boolean esPantallaGrande;
+    //nos permite establecer el orden en el que mostraremos la lista
     private String ordenActualDias;
+
     //necesarias para que funcione la base de datos, el adaptador y poder modificar el listview del fragment
     private DiarioDBAdapter dbAdapterMain;
     private DiarioDB db;
     private ListView lvListaFragment;
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         btAnyadir = findViewById(R.id.btAnyadir);
         btOrdenar = findViewById(R.id.btOrdenar);
         btBorrar = findViewById(R.id.btBorrar);
+        tvSinDia = findViewById(R.id.tvSindia);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         //listview
@@ -73,6 +81,14 @@ public class MainActivity extends AppCompatActivity {
         lvListaFragment.setAdapter(dbAdapterMain);
         ///////////////////////////////////////////////////////////////////////////////////////////
 
+        //comprobamos si estamos en una pantalla grande mirando si existe el frameLayout que contendrá el fragment
+        frameContenedorDinamico = (FrameLayout) findViewById(R.id.frm_contenedorFrgDinamico);
+        if (frameContenedorDinamico == null) {//pantalla pequeña
+            esPantallaGrande = false;
+        } else {
+            esPantallaGrande = true;
+
+        }
         //buscamos el fragment que contiene la lista
         listaFragment = (ListaFragment) getSupportFragmentManager().findFragmentById(R.id.frMain);
 
@@ -81,18 +97,43 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDiarioSeleccionado(DiaDiario dia) {
 
-                //if (esPantallaGrande) {
+                if (esPantallaGrande) {
                 //creamos el fragmento de forma dinámica
-                //   crearFragment(correo);
+                    crearFragment(dia);
 
-                // } else {
-                //si es pantalla pequeña, mostramos el correo en
+                } else {
+                    //si es pantalla pequeña, mostramos el dia en
                 //la actividad correspondiente
                 mostrarDiaPantallaPeque(dia);
-                //}
+                }
 
             }
         });
+
+    }
+
+    /**
+     * Crea un nuevo fragment detalle dia permitiendo la navegabilidad.
+     *
+     * @param dia
+     */
+    private void crearFragment(DiaDiario dia) {
+        //creamos un nuevo fragment enviandole el correo
+        diaFragmentDinamico = DiaFragment.newInstance(dia);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.frm_contenedorFrgDinamico, diaFragmentDinamico);
+        //permitimos la navegabilidad
+        transaction.addToBackStack(null);
+        //activamos el fragment nuevo
+        transaction.commit();
+        tvSinDia.setVisibility(View.INVISIBLE);//no mostrar el textview
+
+        FragmentManager manager = getSupportFragmentManager();
+        if (manager.getBackStackEntryCount() > 0) {
+            manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            tvSinDia.setVisibility(View.VISIBLE);//mostrar el textview
+        }
+
     }
 
     /**
@@ -107,7 +148,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (esPantallaGrande) {
+            //buscamos el fragment anterior.
+            FragmentManager manager = getSupportFragmentManager();
+            if (manager.getBackStackEntryCount() == 0) {
+                //si no hay dia que mostrar en la pila, mostramos el campo de texto y no permitimos borrar
+                tvSinDia.setVisibility(View.VISIBLE);
+            }
+        }
+    }
 
     /**
      * @param menu, para poder mostrar el menu de la aplicacion hace falta inflarlo antes tal que asi.
@@ -116,6 +168,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        if (!esPantallaGrande) {//si es pantalla pequeña ocultamos menu borrar
+            ((MenuItem) menu.findItem((R.id.btBorrar))).setVisible(false);
+        }
         return true;
     }
 
@@ -189,10 +244,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void mostrarMensajeError(Exception e) {
-        Log.e(TAG_ERROR,e.getMessage());
-        Toast.makeText(this, getString(R.string.errorLeerBD)+": "+e.getMessage(),Toast.LENGTH_LONG).show();
-    }
 
     /**
      * Método que se ejecuta cuando se vuelve de una actividad iniciada con startActivityForResult
@@ -208,16 +259,18 @@ public class MainActivity extends AppCompatActivity {
                     DiaDiario p = data.getParcelableExtra(EdicionDiaActivity.EXTRA_DIA_A_GUARDAR);
                     //Guardamos en la base de datos el objeto recuperado
                     listaFragment.addDia(p);
-                    //Usamos el metodo mostrarDias para enseñar la base de datos con todos los datos
+                    //mostramos el dia
                     ordenaPor(ordenActualDias);
+                    listaFragment.leeAdaptador();
                     break;
                 case REQUEST_OPTION_VER_ENTRADA_DIARIO:
                     //recuperamos los datos de la otra actividad y los guardamos en un objeto DiaDiario
                     DiaDiario dia = data.getParcelableExtra(VerDiaActivity.EXTRA_DIA);
                     //Guardamos en la base de datos el objeto recuperado
                     listaFragment.addDia(dia);
-                    //Usamos el metodo mostrarDias para enseñar la base de datos con todos los datos
+                    //mostramos el dia
                     ordenaPor(ordenActualDias);
+                    listaFragment.leeAdaptador();
                     break;
             }
         }
@@ -230,11 +283,11 @@ public class MainActivity extends AppCompatActivity {
         ordenActualDias = orden;
         dbAdapterMain = new DiarioDBAdapter(MainActivity.this, db.obtenDiario(ordenActualDias));
         lvListaFragment.setAdapter(dbAdapterMain);
-
+        listaFragment.leeAdaptador();
     }
 
     /**
-     * Nos permite ordenar y mostrar por fecha el adaptador
+     * Dialogo que nos permite ordenar y mostrar por fecha, valoración o resumen el adaptador
      */
     public void dialogoOrdenarPor() {
 
@@ -251,16 +304,19 @@ public class MainActivity extends AppCompatActivity {
                         ordenaPor(DiarioContract.DiaDiarioEntries.FECHA);
                         Toast.makeText(MainActivity.this, getResources().getString(R.string.ordenarPorFecha),
                                 Toast.LENGTH_LONG).show();
+                        listaFragment.leeAdaptador();
                         break;
                     case 1:
                         ordenaPor(DiarioContract.DiaDiarioEntries.VALORACION);
                         Toast.makeText(MainActivity.this, getResources().getString(R.string.ordenarPorValoracion),
                                 Toast.LENGTH_LONG).show();
+                        listaFragment.leeAdaptador();
                         break;
                     case 2:
                         ordenaPor(DiarioContract.DiaDiarioEntries.RESUMEN);
                         Toast.makeText(MainActivity.this, getResources().getString(R.string.ordenarPorResumen),
                                 Toast.LENGTH_LONG).show();
+                        listaFragment.leeAdaptador();
                         break;
                 }
                 dialog.dismiss();
@@ -297,66 +353,35 @@ public class MainActivity extends AppCompatActivity {
      */
 
     private void borrarPrimerDia() {
-        //Obtenemos un cursor el cual esta ordenado por el orden que hay actualmente
-        Cursor c = db.obtenDiario(ordenActualDias);
-        //Nos intentamos mover a la primera posición del cursor
-        if (c.moveToFirst()) {
-            //Eliminamos la tupla de la base de datos obteniendo la información del cursor
-            db.borraDia(DiarioDB.deCursorADia(c));
-        }
-        Toast.makeText(getApplicationContext(), getResources().getText(R.string.tmMensajeBorrar),
-                Toast.LENGTH_LONG).show();
-        ordenaPor(DiarioContract.DiaDiarioEntries.FECHA);
+        //Creamos un mensaje de alerta para informar al usuario
+        AlertDialog.Builder dialogo = new AlertDialog.Builder(MainActivity.this);
+        //Establecemos el título y el mensaje que queremos
+        dialogo.setTitle(getResources().getString(R.string.tituloBorrar));
+        dialogo.setMessage(getResources().getString(R.string.cuerpoBorrar));
+        // agregamos botón de aceptar al dialogo
+        dialogo.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //Obtenemos un cursor el cual esta ordenado por el orden que hay actualmente
+                Cursor c = db.obtenDiario(ordenActualDias);
+                //Nos intentamos mover a la primera posición del cursor
+                if (c.moveToFirst()) {
+                    //Eliminamos la tupla de la base de datos obteniendo la información del cursor
+                    db.borraDia(DiarioDB.deCursorADia(c));
+                }
+                FragmentManager manager = getSupportFragmentManager();
+                if (manager.getBackStackEntryCount() > 0) {
+                    manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    tvSinDia.setVisibility(View.VISIBLE);//mostramos textview que muestra "MI DIARIO"
+                }
+                ordenaPor(DiarioContract.DiaDiarioEntries.FECHA);
+                listaFragment.leeAdaptador();
+                onRestart();
+            }
+        });
+        //Mostramos el dialogo
+        dialogo.show();
     }
 
-
-    /**
-     * Metodo para mostrar en el textview del MainActivity los datos de la base de datos
-
-
-     private void mostrarDias() {
-     //Obtenemos un cursor el cual esta ordenado por el orden que hay por defecto
-     Cursor c = db.obtenDiario(ordenActualDias);
-     //Almacenamos el dia
-     DiaDiario dia;
-     //limpiamos el campo de texto
-     tvPrincipal.setText("");
-     //Nos aseguramos de que existe al menos un registro
-     if (c.moveToFirst()) {
-     //Recorremos el cursor hasta que no haya más registros
-     do {
-     dia = DiarioDB.deCursorADia(c);
-     //podéis sobrecargar toString en DiaDiario para mostrar los datos
-     //tvPrincipal.append(dia.toString() + "\n");
-     tvPrincipal.append(dia.mostrarDatosBonitos() + "\n");
-     } while (c.moveToNext());
-     }
-     }
-
-
-     * Metodo para mostrar en el textview del MainActivity los datos de la base de datos
-     * en funcion a un orden que me pasan por parametro
-
-
-     private void mostrarDias(String ordenadoPor) {
-     //Obtenemos un cursor el cual esta ordenado por el orden que me pasan
-     Cursor c = db.obtenDiario(ordenadoPor);
-     //Almacenamos el dia
-     DiaDiario dia;
-     //limpiamos el campo de texto
-     tvPrincipal.setText("");
-     //Nos aseguramos de que existe al menos un registro
-     if (c.moveToFirst()) {
-     //Recorremos el cursor hasta que no haya más registros
-     do {
-     dia = DiarioDB.deCursorADia(c);
-     //podéis sobrecargar toString en DiaDiario para mostrar los datos
-     //tvPrincipal.append(dia.toString() + "\n");
-     tvPrincipal.append(dia.mostrarDatosBonitos() + "\n");
-     } while (c.moveToNext());
-     }
-     }
-
-     */
 
 }

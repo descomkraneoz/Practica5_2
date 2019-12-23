@@ -28,6 +28,10 @@
     <string name="ordenarPorValoracion">Ordenar por Valoración </string>
 
     <string name="errorLeerBD">Problema al leer en la base de datos</string>
+    <string name="miDiario">Mi Diario</string>
+
+    <string name="tituloBorrar">Aviso va a Borrar</string>
+    <string name="cuerpoBorrar">Está seguro que desea eliminar la página del diario</string>
 
 
 </resources>

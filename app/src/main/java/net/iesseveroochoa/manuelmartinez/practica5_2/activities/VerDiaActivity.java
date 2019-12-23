@@ -1,6 +1,8 @@
 package net.iesseveroochoa.manuelmartinez.practica5_2.activities;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,12 +19,14 @@ public class VerDiaActivity extends AppCompatActivity {
     private DiaFragment df;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ver_dia);
         dia = (DiaDiario) getIntent().getParcelableExtra(EXTRA_DIA);
         df = (DiaFragment) getSupportFragmentManager().findFragmentById(R.id.frDia);
+
 
     }
 
@@ -31,5 +35,18 @@ public class VerDiaActivity extends AppCompatActivity {
         super.onResume();
         //mostramos el dia en pantalla
         df.setDia(dia);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        ((MenuItem) menu.findItem((R.id.btBorrar))).setVisible(true);
+        ((MenuItem) menu.findItem((R.id.btAcercade))).setVisible(false);
+        ((MenuItem) menu.findItem((R.id.btAnyadir))).setVisible(false);
+        ((MenuItem) menu.findItem((R.id.btMostrarDesdeHasta))).setVisible(false);
+        ((MenuItem) menu.findItem((R.id.btOpciones))).setVisible(false);
+        ((MenuItem) menu.findItem((R.id.btOrdenar))).setVisible(false);
+        ((MenuItem) menu.findItem((R.id.btValorarVida))).setVisible(false);
+        return true;
     }
 }

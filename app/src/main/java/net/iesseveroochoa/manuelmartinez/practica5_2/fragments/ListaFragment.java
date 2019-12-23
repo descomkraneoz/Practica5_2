@@ -49,8 +49,12 @@ public class ListaFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        lvListaFragment = getView().findViewById(R.id.lvListaFragment);
 
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        //listview
+        lvListaFragment = getView().findViewById(R.id.lvListaFragment);
+        //ordenar lista
+        ordenActualDias = DiarioContract.DiaDiarioEntries.FECHA;
         //inciamos Base de datos, adaptador y lista
         db = new DiarioDB(getContext());
         db.open();
@@ -60,6 +64,7 @@ public class ListaFragment extends Fragment {
         Cursor cursor = db.obtenDiario(ordenActualDias);
         dDBadapter = new DiarioDBAdapter(getContext(), cursor);
         lvListaFragment.setAdapter(dDBadapter);
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         //Hacemos a los datos que se quieran guardar sean miembros de la clase por si hay giros de pantalla
         setRetainInstance(true);
@@ -69,7 +74,7 @@ public class ListaFragment extends Fragment {
         if (lvListaFragment == null) {
             cargaDatosPrueba();
         }
-        //mostramos los dias ordenador por fecha
+        //mostramos los dias ordenados por fecha
         ordenaPorFecha();
 
 
@@ -145,7 +150,7 @@ public class ListaFragment extends Fragment {
     /**
      * Actualiza el adaptador
      */
-    private void leeAdaptador() {
+    public void leeAdaptador() {
         Cursor crs = db.obtenDiario(ordenActualDias);
         dDBadapter.changeCursor(crs);
         dDBadapter.notifyDataSetChanged();

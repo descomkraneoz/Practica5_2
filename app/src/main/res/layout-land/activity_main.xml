@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/layout_redondeado"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/tabletPading"
+    android:paddingTop="@dimen/tabletPading"
+    android:paddingRight="@dimen/tabletPading"
+    android:paddingBottom="@dimen/tabletPading"
+    tools:context=".activities.MainActivity">
+
+    <fragment
+        android:id="@+id/frMain"
+        android:name="net.iesseveroochoa.manuelmartinez.practica5_2.fragments.ListaFragment"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_weight="40"
+        tools:layout="@layout/fragment_lista" />
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:background="@android:color/holo_red_dark" />
+
+    <!---En este frame incluiremos el detalle si trabajamos con fragment dinámico.-->
+    <FrameLayout
+        android:id="@+id/frm_contenedorFrgDinamico"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="60"
+        android:background="@drawable/layaout_redondeado_color_claro">
+
+
+        <TextView
+            android:id="@+id/tvSindia"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="@string/miDiario"
+            android:textSize="96sp"
+            tools:text="Mi Diario" />
+    </FrameLayout>
+
+</LinearLayout>
