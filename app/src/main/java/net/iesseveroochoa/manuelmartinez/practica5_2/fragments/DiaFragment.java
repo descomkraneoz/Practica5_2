@@ -40,7 +40,6 @@ public class DiaFragment extends Fragment {
         return fragment;
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -55,12 +54,11 @@ public class DiaFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        tvFechaDiaFragment.findViewById(R.id.tvFechaDiaFragment);
-        tvResumenDiaFragment.findViewById(R.id.tvResumenDiaFragment);
-        tvValoracionDiaFragment.findViewById(R.id.tvValoracionDiaFragment);
-        tvNumeroDiaFragment.findViewById(R.id.tvNumeroDiaFragment);
-        tvTextoDiaFragment.findViewById(R.id.tvTextoDiaFragment);
-
+        tvFechaDiaFragment = getView().findViewById(R.id.tvFechaDiaFragment);
+        tvResumenDiaFragment = getView().findViewById(R.id.tvResumenDiaFragment);
+        tvValoracionDiaFragment = getView().findViewById(R.id.tvValoracionDiaFragment);
+        tvNumeroDiaFragment = getView().findViewById(R.id.tvNumeroDiaFragment);
+        tvTextoDiaFragment = getView().findViewById(R.id.tvTextoDiaFragment);
 
         if (getArguments() != null) {
             //si estamos creando el fragment de forma dinámica y tenemos
@@ -70,7 +68,10 @@ public class DiaFragment extends Fragment {
             //si estamos creandolo de forma estática mostramos datos temporales
             diaDiario = new DiaDiario(new Date("25/12/2019"), 9, "Navidad", "A cantar villancicos...arre burro arre...");
         }
+
+
         visualizaDia();
+
     }
 
     private void visualizaDia() {

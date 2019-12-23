@@ -52,12 +52,21 @@ public class ListaFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        lvListaFragment = getView().findViewById(R.id.lvListaFragment);
+
+        //inciamos Base de datos, adaptador y lista
+        db = new DiarioDB(getContext());
+        db.open();
+        if (savedInstanceState == null) {
+            db.cargaDatosPruebaDesdeBaseDatos();
+        }
+        Cursor cursor = db.obtenDiario(ordenActualDias);
+        dDBadapter = new DiarioDBAdapter(getContext(), cursor);
+        lvListaFragment.setAdapter(dDBadapter);
+
         //Hacemos a los datos que se quieran guardar sean miembros de la clase por si hay giros de pantalla
         setRetainInstance(true);
 
-        lvListaFragment = getView().findViewById(R.id.lvListaFragment);
-        //abrimos la base de datos
-        iniciaBaseDatos();
 
         //si no venimos de una reconstrucción
         if (lvListaFragment == null) {
@@ -81,42 +90,19 @@ public class ListaFragment extends Fragment {
                 }
             }
         });
-
-
     }
 
-    /**
-     * Metodo para Abrir la BAse de datos, tb podemos cargar datos de muestra aunque no lo haremos aquí
-     */
 
-    public void iniciaBaseDatos() {
-        //BASE DE DATOS, inicializamos y cargamos datos de prueba
-        try {
-            //Inicializa la base de datos
-            db = new DiarioDB(getContext());
-            //abre la base de datos
-            db.open();
-            //cargamos unos datos de prueba en la base de datos
-            //db.cargaDatosPrueba();
-
-        } catch (android.database.sqlite.SQLiteException e) {
-            e.printStackTrace();
-        }
-    }
     /**
      * Metodo que inserta en la base de datos los siguientes datos
      */
     public void cargaDatosPrueba() {
-        DiaDiario[] dias = {new DiaDiario(new Date("11/02/2002"),
-                5, "Examen de Lenguaje de Marcas",
-                "Los temas que entran son HTML y CSS, deberas hacer una página" +
-                        " web con la estructura típica, y contestar veinte preguntas de " +
-                        "tipo test en 30 minutos"),
-                new DiaDiario(new Date("03/28/2018"),
-                        10, "Cumpleaños de Manu",
-                        "Fiesta de cumpleaños en Chikipark" +
-                                " traer tortada del Zipi-Zape y comprar regalos en Amazon " +
-                                "lo pasaremos bien")};
+        DiaDiario[] dias = {new DiaDiario(new Date("11/21/2010"),
+                5, "Examen de Ingles",
+                "Los temas que entran son pasiva y activa, reading, speaking, vocabulary y listening"),
+                new DiaDiario(new Date("03/13/2019"),
+                        10, "Excursión a Accenture",
+                        "A las 10:00 coger autobus para ir a Accenture en el puerto de Alicante")};
         for (DiaDiario d : dias) {
             db.insertaDia(d);
         }
@@ -144,16 +130,28 @@ public class ListaFragment extends Fragment {
      * @param dia
      */
     public void addDia(DiaDiario dia) {
-        dDBadapter.agregaDiaBD(dia);
+        db.insertaDia(dia);
+        leeAdaptador();
+
     }
 
     /**
      * Nos permite eliminar un dia
      *
-     * @param pos
+     * @param dia
      */
-    public void delDia(int pos) {
-        dDBadapter.borraDiaBD(pos);
+    public void delDia(DiaDiario dia) {
+        db.borraDia(dia);
+        leeAdaptador();
+    }
+
+    /**
+     * Actualiza el adaptador
+     */
+    private void leeAdaptador() {
+        Cursor crs = db.obtenDiario(ordenActualDias);
+        dDBadapter.changeCursor(crs);
+        dDBadapter.notifyDataSetChanged();
     }
 
     /**

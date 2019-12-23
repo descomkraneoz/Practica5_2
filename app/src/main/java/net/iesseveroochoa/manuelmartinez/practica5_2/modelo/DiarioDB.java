@@ -190,7 +190,7 @@ public class DiarioDB {
     /**
      * Metodo que inserta en la base de datos los siguientes datos
      */
-    public void cargaDatosPruebaBaseDatos() {
+    public void cargaDatosPruebaDesdeBaseDatos() {
         DiaDiario[] dias = {new DiaDiario(new Date("11/02/2002"),
                 5, "Examen de Lenguaje de Marcas",
                 "Los temas que entran son HTML y CSS, deberas hacer una página" +
