@@ -1,8 +1,6 @@
 package net.iesseveroochoa.manuelmartinez.practica5_2.fragments;
 
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -172,17 +169,15 @@ public class ListaFragment extends Fragment {
 
     /**
      * Nos permite ordenar y mostrar el adaptador
-     */
+
     public void ordenaPor(String orden) {
         ordenActualDias = orden;
         dDBadapter = new DiarioDBAdapter(getContext(), db.obtenDiario(ordenActualDias));
         lvListaFragment.setAdapter(dDBadapter);
     }
-
-    /**
      * Nos permite ordenar y mostrar por fecha el adaptador
-     */
-    public void dialogoOrdenarPor() {
+
+     public void dialogoOrdenarPor() {
 
         //array de elementos
         final CharSequence[] itemsDialogo = getResources().getStringArray(R.array.item_menu);
@@ -213,29 +208,8 @@ public class ListaFragment extends Fragment {
             }
         }).show();
 
-    }
+     }*/
 
-    /**
-     * Método que genera un dialogo el cual muestra la media de la puntuacion de los días que hay en la base de datos
-     */
-
-    public void valorarVidaDialog() {
-        //Creamos un mensaje de alerta para informar al usuario
-        AlertDialog.Builder dialogo = new AlertDialog.Builder(getContext());
-        //Establecemos el título y el mensaje que queremos
-        dialogo.setTitle(getResources().getString(R.string.TituloValorarVida));
-        dialogo.setMessage(getResources().getString(R.string.mensajeValoraVida) + " " + db.valoraVida());
-        // agregamos botón de aceptar al dialogo
-        dialogo.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                //Cuando hagan click en el boton saldremos automaticamente,de la misma forma que si pulsa fuera del cuadro de dialogo
-                getExitTransition();
-            }
-        });
-        //Mostramos el dialogo
-        dialogo.show();
-    }
 
 
 }

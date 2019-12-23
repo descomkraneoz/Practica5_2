@@ -3,11 +3,13 @@ package net.iesseveroochoa.manuelmartinez.practica5_2.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -16,6 +18,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import net.iesseveroochoa.manuelmartinez.practica5_2.R;
 import net.iesseveroochoa.manuelmartinez.practica5_2.fragments.ListaFragment;
 import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiaDiario;
+import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiarioContract;
+import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiarioDB;
+import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiarioDBAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,6 +38,13 @@ public class MainActivity extends AppCompatActivity {
 
     ListaFragment listaFragment;
 
+    //nos permite conocer el orden en el que tenemos la lista
+    private String ordenActualDias;
+    //necesarias para que funcione la base de datos, el adaptador y poder modificar el listview del fragment
+    private DiarioDBAdapter dbAdapterMain;
+    private DiarioDB db;
+    private ListView lvListaFragment;
+
 
 
 
@@ -44,6 +56,22 @@ public class MainActivity extends AppCompatActivity {
         btAnyadir = findViewById(R.id.btAnyadir);
         btOrdenar = findViewById(R.id.btOrdenar);
         btBorrar = findViewById(R.id.btBorrar);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        //listview
+        lvListaFragment = findViewById(R.id.lvListaFragment);
+        //ordenar lista
+        ordenActualDias = DiarioContract.DiaDiarioEntries.FECHA;
+        //inciamos Base de datos, adaptador y lista
+        db = new DiarioDB(MainActivity.this);
+        db.open();
+        if (savedInstanceState == null) {
+            db.cargaDatosPruebaDesdeBaseDatos();
+        }
+        Cursor cursor = db.obtenDiario(ordenActualDias);
+        dbAdapterMain = new DiarioDBAdapter(MainActivity.this, cursor);
+        lvListaFragment.setAdapter(dbAdapterMain);
+        ///////////////////////////////////////////////////////////////////////////////////////////
 
         //buscamos el fragment que contiene la lista
         listaFragment = (ListaFragment) getSupportFragmentManager().findFragmentById(R.id.frMain);
@@ -142,14 +170,14 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.btOrdenar:
                 //Llama al metodo para ordenar según unos parámetros
-                listaFragment.dialogoOrdenarPor();
+                dialogoOrdenarPor();
                 break;
             case R.id.btBorrar:
                 //Llama al metodo para borrar el primer dia
-               // borrarPrimerDia();
+                borrarPrimerDia();
                 break;
             case R.id.btValorarVida:
-                listaFragment.valorarVidaDialog();
+                valorarVidaDialog();
                 break;
             case R.id.btMostrarDesdeHasta:
                 Toast.makeText(getApplicationContext(), getResources().getText(R.string.tmMensajeERROR), Toast.LENGTH_LONG).show();
@@ -181,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
                     //Guardamos en la base de datos el objeto recuperado
                     listaFragment.addDia(p);
                     //Usamos el metodo mostrarDias para enseñar la base de datos con todos los datos
-                    listaFragment.dialogoOrdenarPor();
+                    ordenaPor(ordenActualDias);
                     break;
                 case REQUEST_OPTION_VER_ENTRADA_DIARIO:
                     //recuperamos los datos de la otra actividad y los guardamos en un objeto DiaDiario
@@ -189,17 +217,84 @@ public class MainActivity extends AppCompatActivity {
                     //Guardamos en la base de datos el objeto recuperado
                     listaFragment.addDia(dia);
                     //Usamos el metodo mostrarDias para enseñar la base de datos con todos los datos
-                    listaFragment.dialogoOrdenarPor();
+                    ordenaPor(ordenActualDias);
                     break;
             }
         }
     }
 
     /**
+     * Nos permite ordenar y mostrar el adaptador
+     */
+    public void ordenaPor(String orden) {
+        ordenActualDias = orden;
+        dbAdapterMain = new DiarioDBAdapter(MainActivity.this, db.obtenDiario(ordenActualDias));
+        lvListaFragment.setAdapter(dbAdapterMain);
+
+    }
+
+    /**
+     * Nos permite ordenar y mostrar por fecha el adaptador
+     */
+    public void dialogoOrdenarPor() {
+
+        //array de elementos
+        final CharSequence[] itemsDialogo = getResources().getStringArray(R.array.item_menu);
+
+        AlertDialog.Builder dialogo = new AlertDialog.Builder(MainActivity.this);
+        dialogo.setTitle(getResources().getString(R.string.ordenarPor));
+        dialogo.setItems(itemsDialogo, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                switch (item) {
+                    case 0:
+                        ordenaPor(DiarioContract.DiaDiarioEntries.FECHA);
+                        Toast.makeText(MainActivity.this, getResources().getString(R.string.ordenarPorFecha),
+                                Toast.LENGTH_LONG).show();
+                        break;
+                    case 1:
+                        ordenaPor(DiarioContract.DiaDiarioEntries.VALORACION);
+                        Toast.makeText(MainActivity.this, getResources().getString(R.string.ordenarPorValoracion),
+                                Toast.LENGTH_LONG).show();
+                        break;
+                    case 2:
+                        ordenaPor(DiarioContract.DiaDiarioEntries.RESUMEN);
+                        Toast.makeText(MainActivity.this, getResources().getString(R.string.ordenarPorResumen),
+                                Toast.LENGTH_LONG).show();
+                        break;
+                }
+                dialog.dismiss();
+            }
+        }).show();
+
+    }
+
+    /**
+     * Método que genera un dialogo el cual muestra la media de la puntuacion de los días que hay en la base de datos
+     */
+
+    public void valorarVidaDialog() {
+        //Creamos un mensaje de alerta para informar al usuario
+        AlertDialog.Builder dialogo = new AlertDialog.Builder(MainActivity.this);
+        //Establecemos el título y el mensaje que queremos
+        dialogo.setTitle(getResources().getString(R.string.TituloValorarVida));
+        dialogo.setMessage(getResources().getString(R.string.mensajeValoraVida) + " " + db.valoraVida());
+        // agregamos botón de aceptar al dialogo
+        dialogo.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //Cuando hagan click en el boton saldremos automaticamente,de la misma forma que si pulsa fuera del cuadro de dialogo
+                onRestart();
+            }
+        });
+        //Mostramos el dialogo
+        dialogo.show();
+    }
 
 
+    /**
      * Metodo para borrar dias del diario
-
+     */
 
     private void borrarPrimerDia() {
         //Obtenemos un cursor el cual esta ordenado por el orden que hay actualmente
@@ -211,15 +306,8 @@ public class MainActivity extends AppCompatActivity {
         }
         Toast.makeText(getApplicationContext(), getResources().getText(R.string.tmMensajeBorrar),
                 Toast.LENGTH_LONG).show();
-        mostrarDias(DiarioContract.DiaDiarioEntries.FECHA);
+        ordenaPor(DiarioContract.DiaDiarioEntries.FECHA);
     }
-
-
-
-
-
-
-    */
 
 
     /**
