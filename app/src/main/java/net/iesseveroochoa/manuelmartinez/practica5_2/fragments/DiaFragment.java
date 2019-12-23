@@ -19,7 +19,7 @@ import java.util.Date;
  * A simple {@link Fragment} subclass.
  */
 public class DiaFragment extends Fragment {
-    private static final String ARG_DIA = "dia";
+    private static final String ARG_DIA = "net.iesseveroochoa.manuelmartinez.practica5_2.fragments.dia";
     TextView tvFechaDiaFragment;
     TextView tvResumenDiaFragment;
     TextView tvValoracionDiaFragment;
@@ -68,17 +68,14 @@ public class DiaFragment extends Fragment {
             //si estamos creandolo de forma estática mostramos datos temporales
             diaDiario = new DiaDiario(new Date("25/12/2019"), 9, "Navidad", "A cantar villancicos...arre burro arre...");
         }
-
-
         visualizaDia();
-
     }
 
     private void visualizaDia() {
         tvFechaDiaFragment.setText(diaDiario.getFechaFormatoLocal());
         tvResumenDiaFragment.setText(diaDiario.getResumen());
         tvValoracionDiaFragment.setText(getResources().getString(R.string.valoracion));
-        tvNumeroDiaFragment.setText(diaDiario.getValoracionDia());
+        tvNumeroDiaFragment.setText(Integer.toString(diaDiario.getValoracionDia()));
         tvTextoDiaFragment.setText(diaDiario.getContenido());
     }
 

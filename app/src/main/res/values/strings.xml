@@ -8,7 +8,7 @@
     <string name="tmMensajeERROR">NO HACE NADA :)</string>
     <string name="btBorrar">Borrar</string>
     <string name="resumen">Resumen</string>
-    <string name="valoracion">Valoración</string>
+    <string name="valoracion">Valoración: </string>
     <string name="fecha">Fecha</string>
     <string name="valorarVida">Valorar Vida</string>
     <string name="mostrarDesdeHasta">Mostrar desde hasta</string>
@@ -28,9 +28,6 @@
     <string name="ordenarPorValoracion">Ordenar por Valoración </string>
 
     <string name="errorLeerBD">Problema al leer en la base de datos</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>
