@@ -83,14 +83,17 @@ public class MainActivity extends AppCompatActivity {
 
         //comprobamos si estamos en una pantalla grande mirando si existe el frameLayout que contendrá el fragment
         frameContenedorDinamico = (FrameLayout) findViewById(R.id.frm_contenedorFrgDinamico);
+
+        //buscamos los fragment que contiene la lista y los dias
+        listaFragment = (ListaFragment) getSupportFragmentManager().findFragmentById(R.id.frMain);
+        diaFragmentDinamico = (DiaFragment) getSupportFragmentManager().findFragmentById(R.id.frDia);
+
         if (frameContenedorDinamico == null) {//pantalla pequeña
             esPantallaGrande = false;
         } else {
             esPantallaGrande = true;
-
+            esPantallaGrande = (frameContenedorDinamico != null);
         }
-        //buscamos el fragment que contiene la lista
-        listaFragment = (ListaFragment) getSupportFragmentManager().findFragmentById(R.id.frMain);
 
         //Asignamos el evento de seleccion de correo
         listaFragment.setOnListaDiarioListener(new ListaFragment.OnListaDiarioListener() {
@@ -98,13 +101,13 @@ public class MainActivity extends AppCompatActivity {
             public void onDiarioSeleccionado(DiaDiario dia) {
 
                 if (esPantallaGrande) {
-                //creamos el fragmento de forma dinámica
+                    //creamos el fragmento de forma dinámica
                     crearFragment(dia);
 
                 } else {
                     //si es pantalla pequeña, mostramos el dia en
-                //la actividad correspondiente
-                mostrarDiaPantallaPeque(dia);
+                    //la actividad correspondiente
+                    mostrarDiaPantallaPeque(dia);
                 }
 
             }
@@ -118,7 +121,8 @@ public class MainActivity extends AppCompatActivity {
      * @param dia
      */
     private void crearFragment(DiaDiario dia) {
-        //creamos un nuevo fragment enviandole el correo
+        diaFragmentDinamico.setDia(dia);
+        //creamos un nuevo fragment enviandole el dia
         diaFragmentDinamico = DiaFragment.newInstance(dia);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.frm_contenedorFrgDinamico, diaFragmentDinamico);
