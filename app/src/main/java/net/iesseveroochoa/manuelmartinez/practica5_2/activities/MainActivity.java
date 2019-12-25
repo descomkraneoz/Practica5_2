@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,7 +24,6 @@ import net.iesseveroochoa.manuelmartinez.practica5_2.fragments.ListaFragment;
 import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiaDiario;
 import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiarioContract;
 import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiarioDB;
-import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiarioDBAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,10 +48,6 @@ public class MainActivity extends AppCompatActivity {
     //nos permite establecer el orden en el que mostraremos la lista
     private String ordenActualDias;
 
-    //necesarias para que funcione la base de datos, el adaptador y poder modificar el listview del fragment
-    private DiarioDBAdapter dbAdapterMain;
-    private DiarioDB db;
-    private ListView lvListaFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,21 +59,8 @@ public class MainActivity extends AppCompatActivity {
         btBorrar = findViewById(R.id.btBorrar);
         tvSinDia = findViewById(R.id.tvSindia);
 
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        //listview
-        lvListaFragment = findViewById(R.id.lvListaFragment);
-        //ordenar lista
+        //Orden actual de dias
         ordenActualDias = DiarioContract.DiaDiarioEntries.FECHA;
-        //inciamos Base de datos, adaptador y lista
-        db = new DiarioDB(MainActivity.this);
-        db.open();
-        if (savedInstanceState == null) {
-            db.cargaDatosPruebaDesdeBaseDatos();
-        }
-        Cursor cursor = db.obtenDiario(ordenActualDias);
-        dbAdapterMain = new DiarioDBAdapter(MainActivity.this, cursor);
-        lvListaFragment.setAdapter(dbAdapterMain);
-        ///////////////////////////////////////////////////////////////////////////////////////////
 
         //comprobamos si estamos en una pantalla grande mirando si existe el frameLayout que contendrá el fragment
         frameContenedorDinamico = (FrameLayout) findViewById(R.id.frm_contenedorFrgDinamico);
@@ -137,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
             manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             tvSinDia.setVisibility(View.VISIBLE);//mostrar el textview
         }
-
     }
 
     /**
@@ -264,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
                     //Guardamos en la base de datos el objeto recuperado
                     listaFragment.addDia(p);
                     //mostramos el dia
-                    ordenaPor(ordenActualDias);
+                    ordenaPorCaracteristica(ordenActualDias);
                     listaFragment.leeAdaptador();
                     break;
                 case REQUEST_OPTION_VER_ENTRADA_DIARIO:
@@ -273,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
                     //Guardamos en la base de datos el objeto recuperado
                     listaFragment.addDia(dia);
                     //mostramos el dia
-                    ordenaPor(ordenActualDias);
+                    ordenaPorCaracteristica(ordenActualDias);
                     listaFragment.leeAdaptador();
                     break;
             }
@@ -283,10 +263,9 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Nos permite ordenar y mostrar el adaptador
      */
-    public void ordenaPor(String orden) {
+    public void ordenaPorCaracteristica(String orden) {
         ordenActualDias = orden;
-        dbAdapterMain = new DiarioDBAdapter(MainActivity.this, db.obtenDiario(ordenActualDias));
-        lvListaFragment.setAdapter(dbAdapterMain);
+        listaFragment.ordenaPor(orden);
         listaFragment.leeAdaptador();
     }
 
@@ -305,19 +284,19 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int item) {
                 switch (item) {
                     case 0:
-                        ordenaPor(DiarioContract.DiaDiarioEntries.FECHA);
+                        ordenaPorCaracteristica(DiarioContract.DiaDiarioEntries.FECHA);
                         Toast.makeText(MainActivity.this, getResources().getString(R.string.ordenarPorFecha),
                                 Toast.LENGTH_LONG).show();
                         listaFragment.leeAdaptador();
                         break;
                     case 1:
-                        ordenaPor(DiarioContract.DiaDiarioEntries.VALORACION);
+                        ordenaPorCaracteristica(DiarioContract.DiaDiarioEntries.VALORACION);
                         Toast.makeText(MainActivity.this, getResources().getString(R.string.ordenarPorValoracion),
                                 Toast.LENGTH_LONG).show();
                         listaFragment.leeAdaptador();
                         break;
                     case 2:
-                        ordenaPor(DiarioContract.DiaDiarioEntries.RESUMEN);
+                        ordenaPorCaracteristica(DiarioContract.DiaDiarioEntries.RESUMEN);
                         Toast.makeText(MainActivity.this, getResources().getString(R.string.ordenarPorResumen),
                                 Toast.LENGTH_LONG).show();
                         listaFragment.leeAdaptador();
@@ -338,7 +317,7 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder dialogo = new AlertDialog.Builder(MainActivity.this);
         //Establecemos el título y el mensaje que queremos
         dialogo.setTitle(getResources().getString(R.string.TituloValorarVida));
-        dialogo.setMessage(getResources().getString(R.string.mensajeValoraVida) + " " + db.valoraVida());
+        dialogo.setMessage(getResources().getString(R.string.mensajeValoraVida) + " " + listaFragment.valorarVidaListaFragment());
         // agregamos botón de aceptar al dialogo
         dialogo.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
             @Override
@@ -367,18 +346,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //Obtenemos un cursor el cual esta ordenado por el orden que hay actualmente
-                Cursor c = db.obtenDiario(ordenActualDias);
+                Cursor c = listaFragment.obtenerDiario(ordenActualDias);
                 //Nos intentamos mover a la primera posición del cursor
                 if (c.moveToFirst()) {
                     //Eliminamos la tupla de la base de datos obteniendo la información del cursor
-                    db.borraDia(DiarioDB.deCursorADia(c));
+                    listaFragment.delDia(DiarioDB.deCursorADia(c));
                 }
                 FragmentManager manager = getSupportFragmentManager();
                 if (manager.getBackStackEntryCount() > 0) {
                     manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                     tvSinDia.setVisibility(View.VISIBLE);//mostramos textview que muestra "MI DIARIO"
                 }
-                ordenaPor(DiarioContract.DiaDiarioEntries.FECHA);
+                ordenaPorCaracteristica(ordenActualDias);
                 listaFragment.leeAdaptador();
                 onRestart();
             }

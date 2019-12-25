@@ -134,7 +134,6 @@ public class ListaFragment extends Fragment {
     public void addDia(DiaDiario dia) {
         db.insertaDia(dia);
         leeAdaptador();
-
     }
 
     /**
@@ -172,49 +171,67 @@ public class ListaFragment extends Fragment {
         lvListaFragment.setAdapter(dDBadapter);
     }
 
+
     /**
      * Nos permite ordenar y mostrar el adaptador
+     */
 
     public void ordenaPor(String orden) {
         ordenActualDias = orden;
         dDBadapter = new DiarioDBAdapter(getContext(), db.obtenDiario(ordenActualDias));
         lvListaFragment.setAdapter(dDBadapter);
     }
-     * Nos permite ordenar y mostrar por fecha el adaptador
+
+
+    /**
+     * Nos permite saber la media de valoración de los dias del diario
+     */
+
+    public int valorarVidaListaFragment() {
+        return db.valoraVida();
+    }
+
+    /**
+     *
+     */
+    public Cursor obtenerDiario(String ordenDeseado) {
+        return db.obtenDiario(ordenDeseado);
+    }
+
+
+    /** Nos permite ordenar y mostrar por fecha el adaptador
 
      public void dialogoOrdenarPor() {
 
-        //array de elementos
-        final CharSequence[] itemsDialogo = getResources().getStringArray(R.array.item_menu);
+     //array de elementos
+     final CharSequence[] itemsDialogo = getResources().getStringArray(R.array.item_menu);
 
-        AlertDialog.Builder dialogo = new AlertDialog.Builder(getContext());
-        dialogo.setTitle(getResources().getString(R.string.ordenarPor));
-        dialogo.setItems(itemsDialogo, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                switch (item) {
-                    case 0:
-                        ordenaPor(DiarioContract.DiaDiarioEntries.FECHA);
-                        Toast.makeText(getContext(), getResources().getString(R.string.ordenarPorFecha),
-                                Toast.LENGTH_LONG).show();
-                        break;
-                    case 1:
-                        ordenaPor(DiarioContract.DiaDiarioEntries.VALORACION);
-                        Toast.makeText(getContext(), getResources().getString(R.string.ordenarPorValoracion),
-                                Toast.LENGTH_LONG).show();
-                        break;
-                    case 2:
-                        ordenaPor(DiarioContract.DiaDiarioEntries.RESUMEN);
-                        Toast.makeText(getContext(), getResources().getString(R.string.ordenarPorResumen),
-                                Toast.LENGTH_LONG).show();
-                        break;
-                }
-                dialog.dismiss();
-            }
-        }).show();
+     AlertDialog.Builder dialogo = new AlertDialog.Builder(getContext());
+     dialogo.setTitle(getResources().getString(R.string.ordenarPor));
+     dialogo.setItems(itemsDialogo, new DialogInterface.OnClickListener() {
+    @Override public void onClick(DialogInterface dialog, int item) {
+    switch (item) {
+    case 0:
+    ordenaPor(DiarioContract.DiaDiarioEntries.FECHA);
+    Toast.makeText(getContext(), getResources().getString(R.string.ordenarPorFecha),
+    Toast.LENGTH_LONG).show();
+    break;
+    case 1:
+    ordenaPor(DiarioContract.DiaDiarioEntries.VALORACION);
+    Toast.makeText(getContext(), getResources().getString(R.string.ordenarPorValoracion),
+    Toast.LENGTH_LONG).show();
+    break;
+    case 2:
+    ordenaPor(DiarioContract.DiaDiarioEntries.RESUMEN);
+    Toast.makeText(getContext(), getResources().getString(R.string.ordenarPorResumen),
+    Toast.LENGTH_LONG).show();
+    break;
+    }
+    dialog.dismiss();
+    }
+    }).show();
 
      }*/
-
 
 
 }
