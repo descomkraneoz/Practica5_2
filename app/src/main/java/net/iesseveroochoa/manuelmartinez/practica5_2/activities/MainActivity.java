@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
      * @param dia
      */
     private void crearFragment(DiaDiario dia) {
-        diaFragmentDinamico.setDia(dia);
+
         //creamos un nuevo fragment enviandole el dia
         diaFragmentDinamico = DiaFragment.newInstance(dia);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

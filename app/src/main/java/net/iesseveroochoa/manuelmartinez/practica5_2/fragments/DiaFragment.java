@@ -80,7 +80,7 @@ public class DiaFragment extends Fragment {
     }
 
     public void setDia(DiaDiario dia) {
-        this.diaDiario = dia;
+        diaDiario = dia;
         visualizaDia();
     }
 

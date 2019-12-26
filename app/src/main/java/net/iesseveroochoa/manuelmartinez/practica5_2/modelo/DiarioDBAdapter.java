@@ -7,9 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import net.iesseveroochoa.manuelmartinez.practica5_2.R;
 
@@ -52,12 +51,12 @@ public class DiarioDBAdapter extends CursorAdapter {
         TextView tvFechaItemDiario = view.findViewById(R.id.tvFechaItemDiario);
 
         //layout contenedor del item_diario
-        ConstraintLayout lytItem = (ConstraintLayout) view.findViewById(R.id.lyt_Item);
+        LinearLayout llItem = (LinearLayout) view.findViewById(R.id.llItemDiario);
 
         if ((cursor.getPosition() % 2 == 0)) {
-            lytItem.setBackgroundResource(R.drawable.layaout_redondeado_color);
+            llItem.setBackgroundResource(R.drawable.layaout_redondeado_color);
         } else {
-            lytItem.setBackgroundResource(R.drawable.layout_redondeado);
+            llItem.setBackgroundResource(R.drawable.layout_redondeado);
         }
 
 
