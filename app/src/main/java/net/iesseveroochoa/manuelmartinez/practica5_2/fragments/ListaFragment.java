@@ -17,8 +17,6 @@ import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiarioContract;
 import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiarioDB;
 import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiarioDBAdapter;
 
-import java.util.Date;
-
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -50,7 +48,7 @@ public class ListaFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        ///////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////
         //listview
         lvListaFragment = getView().findViewById(R.id.lvListaFragment);
         //ordenar lista
@@ -72,7 +70,7 @@ public class ListaFragment extends Fragment {
 
         //si no venimos de una reconstrucción
         if (lvListaFragment == null) {
-            cargaDatosPrueba();
+            db.cargaDatosPruebaDesdeBaseDatos();
         }
         //mostramos los dias ordenados por fecha
         ordenaPorFecha();
@@ -92,22 +90,6 @@ public class ListaFragment extends Fragment {
                 }
             }
         });
-    }
-
-
-    /**
-     * Metodo que inserta en la base de datos los siguientes datos
-     */
-    public void cargaDatosPrueba() {
-        DiaDiario[] dias = {new DiaDiario(new Date("11/21/2010"),
-                5, "Examen de Ingles",
-                "Los temas que entran son pasiva y activa, reading, speaking, vocabulary y listening"),
-                new DiaDiario(new Date("03/13/2019"),
-                        10, "Excursión a Accenture",
-                        "A las 10:00 coger autobus para ir a Accenture en el puerto de Alicante")};
-        for (DiaDiario d : dias) {
-            db.insertaDia(d);
-        }
     }
 
     //Sobreescribimos el metodo onDestroy para que cierre la base de datos cuando se cierre la aplicacion
@@ -167,8 +149,7 @@ public class ListaFragment extends Fragment {
      */
     public void ordenaPorFecha() {
         ordenActualDias = DiarioContract.DiaDiarioEntries.FECHA;
-        dDBadapter = new DiarioDBAdapter(getContext(), db.obtenDiario(ordenActualDias));
-        lvListaFragment.setAdapter(dDBadapter);
+        leeAdaptador();
     }
 
 
@@ -178,8 +159,10 @@ public class ListaFragment extends Fragment {
 
     public void ordenaPor(String orden) {
         ordenActualDias = orden;
-        dDBadapter = new DiarioDBAdapter(getContext(), db.obtenDiario(ordenActualDias));
+        Cursor crs = db.obtenDiario(orden);
+        dDBadapter.changeCursor(crs);
         lvListaFragment.setAdapter(dDBadapter);
+        dDBadapter.notifyDataSetChanged();
     }
 
 
@@ -197,41 +180,6 @@ public class ListaFragment extends Fragment {
     public Cursor obtenerDiario(String ordenDeseado) {
         return db.obtenDiario(ordenDeseado);
     }
-
-
-    /** Nos permite ordenar y mostrar por fecha el adaptador
-
-     public void dialogoOrdenarPor() {
-
-     //array de elementos
-     final CharSequence[] itemsDialogo = getResources().getStringArray(R.array.item_menu);
-
-     AlertDialog.Builder dialogo = new AlertDialog.Builder(getContext());
-     dialogo.setTitle(getResources().getString(R.string.ordenarPor));
-     dialogo.setItems(itemsDialogo, new DialogInterface.OnClickListener() {
-    @Override public void onClick(DialogInterface dialog, int item) {
-    switch (item) {
-    case 0:
-    ordenaPor(DiarioContract.DiaDiarioEntries.FECHA);
-    Toast.makeText(getContext(), getResources().getString(R.string.ordenarPorFecha),
-    Toast.LENGTH_LONG).show();
-    break;
-    case 1:
-    ordenaPor(DiarioContract.DiaDiarioEntries.VALORACION);
-    Toast.makeText(getContext(), getResources().getString(R.string.ordenarPorValoracion),
-    Toast.LENGTH_LONG).show();
-    break;
-    case 2:
-    ordenaPor(DiarioContract.DiaDiarioEntries.RESUMEN);
-    Toast.makeText(getContext(), getResources().getString(R.string.ordenarPorResumen),
-    Toast.LENGTH_LONG).show();
-    break;
-    }
-    dialog.dismiss();
-    }
-    }).show();
-
-     }*/
 
 
 }

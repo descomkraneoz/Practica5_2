@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     DiaFragment diaFragmentDinamico;
     //fragmento contenedor para tablet de dia
     FrameLayout frameContenedorDinamico;
-    //el fragment que se va a mostrar con la lista
+    //el fragment que se va a mostrar con la lista de dias
     ListaFragment listaFragment;
     //bandera para saber en que tipo de pantalla estamos
     private boolean esPantallaGrande;
@@ -69,11 +69,11 @@ public class MainActivity extends AppCompatActivity {
         listaFragment = (ListaFragment) getSupportFragmentManager().findFragmentById(R.id.frMain);
         diaFragmentDinamico = (DiaFragment) getSupportFragmentManager().findFragmentById(R.id.frDia);
 
-        if (frameContenedorDinamico == null) {//pantalla pequeña
-            esPantallaGrande = false;
-        } else {
+        if (frameContenedorDinamico != null) {
             esPantallaGrande = true;
-            esPantallaGrande = (frameContenedorDinamico != null);
+        } else {
+            esPantallaGrande = false;
+
         }
 
         //Asignamos el evento de seleccion de correo
@@ -86,11 +86,9 @@ public class MainActivity extends AppCompatActivity {
                     crearFragment(dia);
 
                 } else {
-                    //si es pantalla pequeña, mostramos el dia en
-                    //la actividad correspondiente
+                    //si es pantalla pequeña, mostramos el dia en la actividad correspondiente
                     mostrarDiaPantallaPeque(dia);
                 }
-
             }
         });
 
@@ -244,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
                     //Guardamos en la base de datos el objeto recuperado
                     listaFragment.addDia(p);
                     //mostramos el dia
-                    ordenaPorCaracteristica(ordenActualDias);
+                    listaFragment.ordenaPor(ordenActualDias);
                     listaFragment.leeAdaptador();
                     break;
                 case REQUEST_OPTION_VER_ENTRADA_DIARIO:
@@ -253,24 +251,16 @@ public class MainActivity extends AppCompatActivity {
                     //Guardamos en la base de datos el objeto recuperado
                     listaFragment.addDia(dia);
                     //mostramos el dia
-                    ordenaPorCaracteristica(ordenActualDias);
+                    listaFragment.ordenaPor(ordenActualDias);
                     listaFragment.leeAdaptador();
                     break;
             }
         }
     }
 
-    /**
-     * Nos permite ordenar y mostrar el adaptador
-     */
-    public void ordenaPorCaracteristica(String orden) {
-        ordenActualDias = orden;
-        listaFragment.ordenaPor(orden);
-        listaFragment.leeAdaptador();
-    }
 
     /**
-     * Dialogo que nos permite ordenar y mostrar por fecha, valoración o resumen el adaptador
+     * Dialogo que nos permite ordenar y mostrar por fecha, valoración o resumen
      */
     public void dialogoOrdenarPor() {
 
@@ -284,19 +274,19 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int item) {
                 switch (item) {
                     case 0:
-                        ordenaPorCaracteristica(DiarioContract.DiaDiarioEntries.FECHA);
+                        listaFragment.ordenaPor(DiarioContract.DiaDiarioEntries.FECHA);
                         Toast.makeText(MainActivity.this, getResources().getString(R.string.ordenarPorFecha),
                                 Toast.LENGTH_LONG).show();
                         listaFragment.leeAdaptador();
                         break;
                     case 1:
-                        ordenaPorCaracteristica(DiarioContract.DiaDiarioEntries.VALORACION);
+                        listaFragment.ordenaPor(DiarioContract.DiaDiarioEntries.VALORACION);
                         Toast.makeText(MainActivity.this, getResources().getString(R.string.ordenarPorValoracion),
                                 Toast.LENGTH_LONG).show();
                         listaFragment.leeAdaptador();
                         break;
                     case 2:
-                        ordenaPorCaracteristica(DiarioContract.DiaDiarioEntries.RESUMEN);
+                        listaFragment.ordenaPor(DiarioContract.DiaDiarioEntries.RESUMEN);
                         Toast.makeText(MainActivity.this, getResources().getString(R.string.ordenarPorResumen),
                                 Toast.LENGTH_LONG).show();
                         listaFragment.leeAdaptador();
@@ -357,7 +347,7 @@ public class MainActivity extends AppCompatActivity {
                     manager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                     tvSinDia.setVisibility(View.VISIBLE);//mostramos textview que muestra "MI DIARIO"
                 }
-                ordenaPorCaracteristica(ordenActualDias);
+                listaFragment.ordenaPor(ordenActualDias);
                 listaFragment.leeAdaptador();
                 onRestart();
             }
