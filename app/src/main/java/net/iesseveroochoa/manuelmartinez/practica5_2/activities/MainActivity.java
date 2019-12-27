@@ -335,15 +335,21 @@ public class MainActivity extends AppCompatActivity {
         final View vistaValoraVida = imagenValorarVida.inflate(R.layout.imagen, null);
         ivImagen = findViewById(R.id.ivImagenValoraVida);
         //Creamos un mensaje de alerta para informar al usuario
-        AlertDialog.Builder dialogo = new AlertDialog.Builder(MainActivity.this);
+        AlertDialog.Builder dialogo = new AlertDialog.Builder(this);
 
         //Establecemos el título y el mensaje que queremos
         if (listaFragment.valorarVidaListaFragment() < 5) {
-            ivImagen.setImageResource(R.drawable.sadg);
+            ivImagen.setBackgroundResource(R.drawable.sadg);
+            ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.sadg));
+            //ivImagen.setImageResource(R.drawable.sadg);
         } else if (listaFragment.valorarVidaListaFragment() >= 5 && listaFragment.valorarVidaListaFragment() <= 8) {
-            ivImagen.setImageResource(R.drawable.neutrog);
+            ivImagen.setBackgroundResource(R.drawable.neutrog);
+            //ivImagen.setImageResource(R.drawable.neutrog);
+            //ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.neutrog));
         } else {
-            ivImagen.setImageResource(R.drawable.smileg);
+            ivImagen.setBackgroundResource(R.drawable.smileg);
+            //ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.smileg));
+            //ivImagen.setImageResource(R.drawable.smileg);
         }
         //cargamos la vista del dialogo
         dialogo.setView(vistaValoraVida);
