@@ -29,8 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Constante para mandar datos de una actividad a otra cuando se edita o crea una nueva entrada al diario
     public final static int REQUEST_OPTION_NUEVA_ENTRADA_DIARIO = 0;
-    public final static int REQUEST_OPTION_VER_ENTRADA_DIARIO = 1;
-    public final static int REQUEST_OPTION_BORRAR_ENTRADA_DIARIO = 2;
+    public final static int REQUEST_OPTION_BORRAR_ENTRADA_DIARIO = 1;
 
     //Declaracion de los distintos elementos
     Button btAcercade;
@@ -82,17 +81,35 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDiarioSeleccionado(DiaDiario dia) {
 
-                if (esPantallaGrande) {
+                if (!esPantallaGrande) {
+                    //si es pantalla pequeña, mostramos el dia en la actividad correspondiente
+                    borrarDiaPantallaPeque(dia);
+
+                } else {
                     //creamos el fragmento de forma dinámica
                     crearFragment(dia);
 
-                } else {
-                    //si es pantalla pequeña, mostramos el dia en la actividad correspondiente
-                    mostrarDiaPantallaPeque(dia);
                 }
             }
         });
 
+    }
+
+    /**
+     * Metodo para controlar cuando el usuario pulsa el boton de back
+     */
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (esPantallaGrande) {
+            //buscamos el fragment anterior.
+            FragmentManager manager = getSupportFragmentManager();
+            if (manager.getBackStackEntryCount() == 0) {
+                //si no hay dia que mostrar en la pila, mostramos el campo de texto y no permitimos borrar
+                tvSinDia.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     /**
@@ -101,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
      * @param dia
      */
     private void crearFragment(DiaDiario dia) {
-
         //creamos un nuevo fragment enviandole el dia
         diaFragmentDinamico = DiaFragment.newInstance(dia);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -120,28 +136,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Metodo para pantalla pequeña que muestra un correo seleccionado
+     * Metodo para pantalla pequeña que borrara un correo seleccionado, sustituye al de mostrar dia
      */
-    public void mostrarDiaPantallaPeque(DiaDiario dia) {
+    public void borrarDiaPantallaPeque(DiaDiario dia) {
         //creamos un intent y le pasamos la actividad que llama a la actividad que recibe
         Intent i = new Intent(MainActivity.this, VerDiaActivity.class);
         i.putExtra(VerDiaActivity.EXTRA_DIA, dia);
         //iniciamos el intent y le pasamos una constante para guardar/enviar los datos
-        startActivityForResult(i, REQUEST_OPTION_VER_ENTRADA_DIARIO);
-    }
-
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        if (esPantallaGrande) {
-            //buscamos el fragment anterior.
-            FragmentManager manager = getSupportFragmentManager();
-            if (manager.getBackStackEntryCount() == 0) {
-                //si no hay dia que mostrar en la pila, mostramos el campo de texto y no permitimos borrar
-                tvSinDia.setVisibility(View.VISIBLE);
-            }
-        }
+        startActivityForResult(i, REQUEST_OPTION_BORRAR_ENTRADA_DIARIO);
     }
 
     /**
@@ -211,13 +213,8 @@ public class MainActivity extends AppCompatActivity {
                 dialogoOrdenarPor();
                 break;
             case R.id.btBorrar:
-                if (esPantallaGrande) {
-                    //Llama al metodo para borrar el primer dia
-                    borrarPrimerDia();
-                } else {
-                    //llama al metodo para borrar en pantalla pequeña
-                    borrarDiaPantallaPeque();
-                }
+                //Llama al metodo para borrar el primer dia
+                borrarPrimerDia();
                 break;
             case R.id.btValorarVida:
                 valorarVidaDialog();
@@ -247,28 +244,12 @@ public class MainActivity extends AppCompatActivity {
                     DiaDiario p = data.getParcelableExtra(EdicionDiaActivity.EXTRA_DIA_A_GUARDAR);
                     //Guardamos en la base de datos el objeto recuperado
                     listaFragment.addDia(p);
-                    //mostramos el dia
-                    listaFragment.ordenaPor(ordenActualDias);
-                    listaFragment.leeAdaptador();
-                    break;
-                case REQUEST_OPTION_VER_ENTRADA_DIARIO:
-                    //recuperamos los datos de la otra actividad y los guardamos en un objeto DiaDiario
-                    DiaDiario dia = data.getParcelableExtra(VerDiaActivity.EXTRA_DIA);
-                    //Guardamos en la base de datos el objeto recuperado
-                    listaFragment.addDia(dia);
-                    //mostramos el dia
-                    listaFragment.ordenaPor(ordenActualDias);
-                    listaFragment.leeAdaptador();
                     break;
                 case REQUEST_OPTION_BORRAR_ENTRADA_DIARIO:
                     //recuperamos los datos de la otra actividad y los guardamos en un objeto DiaDiario
                     DiaDiario diaBorrar = data.getParcelableExtra(VerDiaActivity.EXTRA_DIA);
                     //Borramos en la base de datos el objeto recuperado
                     listaFragment.delDia(diaBorrar);
-                    //mostramos el dia
-                    //listaFragment.ordenaPor(ordenActualDias);
-                    //listaFragment.leeAdaptador();
-
                     break;
             }
         }
@@ -370,16 +351,6 @@ public class MainActivity extends AppCompatActivity {
         });
         //Mostramos el dialogo
         dialogo.show();
-    }
-
-    /**
-     * Metodo para pantalla pequeña que borrara un correo seleccionado
-     */
-    public void borrarDiaPantallaPeque() {
-        //creamos un intent y le pasamos la actividad que llama a la actividad que recibe
-        Intent i = new Intent(MainActivity.this, VerDiaActivity.class);
-        //iniciamos el intent y le pasamos una constante para guardar/enviar los datos
-        startActivityForResult(i, REQUEST_OPTION_BORRAR_ENTRADA_DIARIO);
     }
 
 

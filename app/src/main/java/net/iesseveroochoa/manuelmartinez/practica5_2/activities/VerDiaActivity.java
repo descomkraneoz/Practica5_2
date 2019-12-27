@@ -31,7 +31,6 @@ public class VerDiaActivity extends AppCompatActivity {
         dia = (DiaDiario) getIntent().getParcelableExtra(EXTRA_DIA);
         df = (DiaFragment) getSupportFragmentManager().findFragmentById(R.id.frDia);
 
-
     }
 
     @Override
@@ -39,6 +38,12 @@ public class VerDiaActivity extends AppCompatActivity {
         super.onResume();
         //mostramos el dia en pantalla
         df.setDia(dia);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
@@ -59,13 +64,14 @@ public class VerDiaActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.btBorrar:
                 //Llama al metodo para borrar el dia
-                DialogoBorrarDia();
+                dialogoBorrarDia();
+                setTitle("Página Borrada");
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void DialogoBorrarDia() {
+    private void dialogoBorrarDia() {
         //Creamos un mensaje de alerta para informar al usuario
         AlertDialog.Builder dialogo = new AlertDialog.Builder(VerDiaActivity.this);
         //Establecemos el título y el mensaje que queremos
@@ -87,4 +93,5 @@ public class VerDiaActivity extends AppCompatActivity {
         //Mostramos el dialogo
         dialogo.show();
     }
+
 }
