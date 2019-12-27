@@ -1,7 +1,5 @@
 package net.iesseveroochoa.manuelmartinez.practica5_2.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
@@ -14,12 +12,13 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
-import net.iesseveroochoa.manuelmartinez.practica5_2.fragments.DatePickerFragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import net.iesseveroochoa.manuelmartinez.practica5_2.R;
+import net.iesseveroochoa.manuelmartinez.practica5_2.fragments.DatePickerFragment;
 import net.iesseveroochoa.manuelmartinez.practica5_2.modelo.DiaDiario;
 
 import java.text.ParseException;
@@ -42,7 +41,9 @@ public class EdicionDiaActivity extends AppCompatActivity implements DatePickerD
     EditText etContenido;
     FloatingActionButton fabGuardar;
 
-    //Método que genera un dialogo el cual indica que hay algunos campos incompletos y se deben rellenar
+    /**
+     * Método que genera un dialogo el cual indica que hay algunos campos incompletos y se deben rellenar
+     */
     private void dialogoCamposIncompletos() {
         AlertDialog.Builder dlgAcercaDe = new AlertDialog.Builder(this);
         //Establecemos el título y el mensaje que queremos
@@ -53,6 +54,7 @@ public class EdicionDiaActivity extends AppCompatActivity implements DatePickerD
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 //Cuando hagan click en el boton saldremos automaticamente,de la misma forma que si pulsa fuera del cuadro de dialogo
+                onBackPressed();
             }
         });
         //Mostramos el dialogo
@@ -71,6 +73,8 @@ public class EdicionDiaActivity extends AppCompatActivity implements DatePickerD
         etContenido = findViewById(R.id.etResumenGeneral);
         fabGuardar = findViewById(R.id.fabGuardar);
         this.setTitle(getResources().getText(R.string.TituloEDA));
+        //flecha en el menu para volver atras
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Por defecto mostraremos como día la fecha de hoy,por lo que la mostramos en el textView puesto para ello
         etFecha.setText(new SimpleDateFormat("dd/MM/yyyy").format(new Date()));
@@ -125,6 +129,16 @@ public class EdicionDiaActivity extends AppCompatActivity implements DatePickerD
 
         });
 
+    }
+
+    /**
+     * Metodo para volver atras al pulsar sobre la flecha del menu
+     */
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return false;
     }
 
     /**

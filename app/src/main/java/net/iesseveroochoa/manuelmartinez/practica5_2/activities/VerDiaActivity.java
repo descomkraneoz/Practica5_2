@@ -30,7 +30,19 @@ public class VerDiaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_ver_dia);
         dia = (DiaDiario) getIntent().getParcelableExtra(EXTRA_DIA);
         df = (DiaFragment) getSupportFragmentManager().findFragmentById(R.id.frDia);
+        //flecha en el menu para volver atras
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+    }
+
+    /**
+     * Metodo para volver atras al pulsar sobre la flecha del menu
+     */
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return false;
     }
 
     @Override
