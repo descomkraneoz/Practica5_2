@@ -212,7 +212,7 @@ public class DiarioDB {
     public int valoraVida() {
         //Creamos una variable para almacenar la media y la inicializamos en 0
         int media = 0;
-        //Cremaos una variable para ponerla como sobrenombre de la columna que nos devuelva y poder obtener con facilidad el valor devuelto
+        //Creamos una variable para ponerla como sobrenombre de la columna que nos devuelva y poder obtener con facilidad el valor devuelto
         String sobrenombre = "media";
         //Ejecutamos la instrucción sql y almacenamos el resultado en un cursor
         Cursor c = db.rawQuery("select avg(" + DiaDiarioEntries.VALORACION + ") as " + sobrenombre + " from " + DiaDiarioEntries.TABLE_NAME, null);
@@ -223,7 +223,10 @@ public class DiarioDB {
         }
         //Cerramos el cursor
         c.close();
+
         //Devolvemos el valor
         return media;
+
     }
+
 }

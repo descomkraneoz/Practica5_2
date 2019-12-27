@@ -5,11 +5,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     Button btOrdenar;
     Button btBorrar;
     TextView tvSinDia;
+    //para el icono de valor vida
+    ImageView ivValoraVida;
     //fragmento detalle de dia
     DiaFragment diaFragmentDinamico;
     //fragmento contenedor para tablet de dia
@@ -58,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         btOrdenar = findViewById(R.id.btOrdenar);
         btBorrar = findViewById(R.id.btBorrar);
         tvSinDia = findViewById(R.id.tvSindia);
+
 
         //Orden actual de dias
         ordenActualDias = DiarioContract.DiaDiarioEntries.FECHA;
@@ -217,7 +222,8 @@ public class MainActivity extends AppCompatActivity {
                 borrarPrimerDia();
                 break;
             case R.id.btValorarVida:
-                valorarVidaDialog();
+                valorarVidaDialogImagen();
+                //valorarVidaDialog();
                 break;
             case R.id.btMostrarDesdeHasta:
                 Toast.makeText(getApplicationContext(), getResources().getText(R.string.tmMensajeERROR), Toast.LENGTH_LONG).show();
@@ -305,6 +311,40 @@ public class MainActivity extends AppCompatActivity {
         //Establecemos el título y el mensaje que queremos
         dialogo.setTitle(getResources().getString(R.string.TituloValorarVida));
         dialogo.setMessage(getResources().getString(R.string.mensajeValoraVida) + " " + listaFragment.valorarVidaListaFragment());
+        // agregamos botón de aceptar al dialogo
+        dialogo.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //Cuando hagan click en el boton saldremos automaticamente,de la misma forma que si pulsa fuera del cuadro de dialogo
+                onRestart();
+            }
+        });
+        //Mostramos el dialogo
+        dialogo.show();
+    }
+
+    /**
+     * Método que genera un dialogo el cual muestra una imagen segun la media de la puntuacion de los días que hay en la base de datos
+     */
+
+    public void valorarVidaDialogImagen() {
+        //inflamos el layout que contendra la imagen para valorar vida y su vista
+        LayoutInflater imagenValorarVida = LayoutInflater.from(MainActivity.this);
+        final View vistaValoraVida = imagenValorarVida.inflate(R.layout.imagen, null);
+        ivValoraVida.setImageResource(R.drawable.neutrog);
+
+        //Creamos un mensaje de alerta para informar al usuario
+        AlertDialog.Builder dialogo = new AlertDialog.Builder(MainActivity.this);
+        dialogo.setView(vistaValoraVida);
+        //Establecemos el título y el mensaje que queremos
+        if (listaFragment.valorarVidaListaFragment() < 5) {
+            dialogo.setView(vistaValoraVida);
+        } else if (listaFragment.valorarVidaListaFragment() >= 5 && listaFragment.valorarVidaListaFragment() <= 8) {
+            dialogo.setIcon(R.drawable.neutrog);
+        } else {
+            dialogo.setIcon(R.drawable.smileg);
+        }
+
         // agregamos botón de aceptar al dialogo
         dialogo.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
             @Override

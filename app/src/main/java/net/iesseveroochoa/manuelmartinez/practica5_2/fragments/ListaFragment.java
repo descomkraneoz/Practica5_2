@@ -174,8 +174,9 @@ public class ListaFragment extends Fragment {
         return db.valoraVida();
     }
 
+
     /**
-     *
+     * Metodo que obtiene un cursor
      */
     public Cursor obtenerDiario(String ordenDeseado) {
         return db.obtenDiario(ordenDeseado);
