@@ -38,9 +38,10 @@ public class MainActivity extends AppCompatActivity {
     Button btAnyadir;
     Button btOrdenar;
     Button btBorrar;
+    //para cuando no haya dia seleccionado en tablet
     TextView tvSinDia;
-    //para el icono de valor vida
-    ImageView ivValoraVida;
+    //para el dialogo de valorar vida en imagen
+    ImageView ivImagen;
     //fragmento detalle de dia
     DiaFragment diaFragmentDinamico;
     //fragmento contenedor para tablet de dia
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         btBorrar = findViewById(R.id.btBorrar);
         tvSinDia = findViewById(R.id.tvSindia);
 
+        //ivImagen=findViewById(R.id.ivImagenValoraVida);
 
         //Orden actual de dias
         ordenActualDias = DiarioContract.DiaDiarioEntries.FECHA;
@@ -165,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Metodo para crear el mensaje de alerta al pulsar sobre el boton de Acerca de del Menu de la app
+     * Metodo para crear el mensaje de alerta al pulsar sobre el boton de Acerca de... del Menu de la app
      */
 
     public void MensajeAcercade() {
@@ -188,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Metodo del boton (+) del menu que llama a la PoblacionActivity
+     * Metodo del boton (+) del menu que llama a la EdicionDiaActivity
      */
 
     public void agregaDiaDiario() {
@@ -331,19 +333,20 @@ public class MainActivity extends AppCompatActivity {
         //inflamos el layout que contendra la imagen para valorar vida y su vista
         LayoutInflater imagenValorarVida = LayoutInflater.from(MainActivity.this);
         final View vistaValoraVida = imagenValorarVida.inflate(R.layout.imagen, null);
-        ivValoraVida.setImageResource(R.drawable.neutrog);
-
+        ivImagen = findViewById(R.id.ivImagenValoraVida);
         //Creamos un mensaje de alerta para informar al usuario
         AlertDialog.Builder dialogo = new AlertDialog.Builder(MainActivity.this);
-        dialogo.setView(vistaValoraVida);
+
         //Establecemos el título y el mensaje que queremos
         if (listaFragment.valorarVidaListaFragment() < 5) {
-            dialogo.setView(vistaValoraVida);
+            ivImagen.setImageResource(R.drawable.sadg);
         } else if (listaFragment.valorarVidaListaFragment() >= 5 && listaFragment.valorarVidaListaFragment() <= 8) {
-            dialogo.setIcon(R.drawable.neutrog);
+            ivImagen.setImageResource(R.drawable.neutrog);
         } else {
-            dialogo.setIcon(R.drawable.smileg);
+            ivImagen.setImageResource(R.drawable.smileg);
         }
+        //cargamos la vista del dialogo
+        dialogo.setView(vistaValoraVida);
 
         // agregamos botón de aceptar al dialogo
         dialogo.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
