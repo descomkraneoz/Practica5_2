@@ -368,7 +368,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     /**
-     * Metodo para borrar dias del diario en pantalla tablet
+     * Metodo para borrar dias del diario en pantalla tablet.
      */
 
     private void borrarPrimerDia() {
