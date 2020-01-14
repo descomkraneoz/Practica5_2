@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         btBorrar = findViewById(R.id.btBorrar);
         tvSinDia = findViewById(R.id.tvSindia);
 
-        //ivImagen=findViewById(R.id.ivImagenValoraVida);
+        ivImagen = (ImageView) findViewById(R.id.ivImagenValoraVida);
 
         //Orden actual de dias
         ordenActualDias = DiarioContract.DiaDiarioEntries.FECHA;
@@ -331,9 +331,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void valorarVidaDialogImagen() {
         //inflamos el layout que contendra la imagen para valorar vida y su vista
-        LayoutInflater imagenValorarVida = LayoutInflater.from(MainActivity.this);
-        final View vistaValoraVida = imagenValorarVida.inflate(R.layout.imagen, null);
-        ivImagen = findViewById(R.id.ivImagenValoraVida);
+        LayoutInflater layoutImagenValorarVida = LayoutInflater.from(MainActivity.this);
+        final View vistaValoraVida = layoutImagenValorarVida.inflate(R.layout.imagen, null);
+        //ivImagen = findViewById(R.id.ivImagenValoraVida);
         //Creamos un mensaje de alerta para informar al usuario
         AlertDialog.Builder dialogo = new AlertDialog.Builder(this);
 
@@ -341,15 +341,15 @@ public class MainActivity extends AppCompatActivity {
         if (listaFragment.valorarVidaListaFragment() < 5) {
             ivImagen.setBackgroundResource(R.drawable.sadg);
             ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.sadg));
-            //ivImagen.setImageResource(R.drawable.sadg);
+            ivImagen.setImageResource(R.drawable.sadg);
         } else if (listaFragment.valorarVidaListaFragment() >= 5 && listaFragment.valorarVidaListaFragment() <= 8) {
             ivImagen.setBackgroundResource(R.drawable.neutrog);
-            //ivImagen.setImageResource(R.drawable.neutrog);
-            //ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.neutrog));
+            ivImagen.setImageResource(R.drawable.neutrog);
+            ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.neutrog));
         } else {
             ivImagen.setBackgroundResource(R.drawable.smileg);
-            //ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.smileg));
-            //ivImagen.setImageResource(R.drawable.smileg);
+            ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.smileg));
+            ivImagen.setImageResource(R.drawable.smileg);
         }
         //cargamos la vista del dialogo
         dialogo.setView(vistaValoraVida);
