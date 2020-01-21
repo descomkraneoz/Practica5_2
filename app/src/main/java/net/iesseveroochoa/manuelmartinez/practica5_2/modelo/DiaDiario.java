@@ -102,6 +102,10 @@ public class DiaDiario implements Parcelable {
         this.longitud = longitud;
     }
 
+    /**
+     * para el item diario
+     */
+
     public int getValoracionResumida(){
         if (valoracionDia<5){
             return R.drawable.sadp;
@@ -109,6 +113,16 @@ public class DiaDiario implements Parcelable {
             return R.drawable.neutrop;
         }else {
             return R.drawable.smilep;
+        }
+    }
+
+    public int getValoracionResumidaDialogo() {
+        if (valoracionDia < 5) {
+            return R.drawable.sadg;
+        } else if (valoracionDia >= 5 && valoracionDia <= 8) {
+            return R.drawable.neutrog;
+        } else {
+            return R.drawable.smileg;
         }
     }
 

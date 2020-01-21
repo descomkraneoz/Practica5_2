@@ -333,23 +333,26 @@ public class MainActivity extends AppCompatActivity {
         //inflamos el layout que contendra la imagen para valorar vida y su vista
         LayoutInflater layoutImagenValorarVida = LayoutInflater.from(MainActivity.this);
         final View vistaValoraVida = layoutImagenValorarVida.inflate(R.layout.imagen, null);
-        //ivImagen = findViewById(R.id.ivImagenValoraVida);
+
+        ivImagen = findViewById(R.id.ivImagenValoraVida);
+
+        int valor = listaFragment.valorarVidaListaFragment();
         //Creamos un mensaje de alerta para informar al usuario
         AlertDialog.Builder dialogo = new AlertDialog.Builder(this);
 
         //Establecemos el título y el mensaje que queremos
-        if (listaFragment.valorarVidaListaFragment() < 5) {
-            ivImagen.setBackgroundResource(R.drawable.sadg);
-            ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.sadg));
-            ivImagen.setImageResource(R.drawable.sadg);
-        } else if (listaFragment.valorarVidaListaFragment() >= 5 && listaFragment.valorarVidaListaFragment() <= 8) {
-            ivImagen.setBackgroundResource(R.drawable.neutrog);
-            ivImagen.setImageResource(R.drawable.neutrog);
-            ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.neutrog));
+        if (valor < 5) {
+            ivImagen.setBackgroundResource(R.drawable.sadp);
+            ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.sadp));
+            ivImagen.setImageResource(R.drawable.sadp);
+        } else if (valor >= 5 && valor <= 8) {
+            ivImagen.setBackgroundResource(R.drawable.neutrop);
+            ivImagen.setImageResource(R.drawable.neutrop);
+            ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.neutrop));
         } else {
-            ivImagen.setBackgroundResource(R.drawable.smileg);
-            ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.smileg));
-            ivImagen.setImageResource(R.drawable.smileg);
+            ivImagen.setBackgroundResource(R.drawable.smilep);
+            ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.smilep));
+            ivImagen.setImageResource(R.drawable.smilep);
         }
         //cargamos la vista del dialogo
         dialogo.setView(vistaValoraVida);
