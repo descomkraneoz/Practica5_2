@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -64,7 +66,10 @@ public class MainActivity extends AppCompatActivity {
         btBorrar = findViewById(R.id.btBorrar);
         tvSinDia = findViewById(R.id.tvSindia);
 
-        ivImagen = (ImageView) findViewById(R.id.ivImagenValoraVida);
+        //Cargar el imagenView del dialogo valorar vida, asignar un valor por defecto----> error null pointer************************************************
+        ivImagen = findViewById(R.id.ivImagenVV);
+//        ivImagen.setBackgroundResource(R.drawable.neutrop);
+
 
         //Orden actual de dias
         ordenActualDias = DiarioContract.DiaDiarioEntries.FECHA;
@@ -332,27 +337,44 @@ public class MainActivity extends AppCompatActivity {
     public void valorarVidaDialogImagen() {
         //inflamos el layout que contendra la imagen para valorar vida y su vista
         LayoutInflater layoutImagenValorarVida = LayoutInflater.from(MainActivity.this);
-        final View vistaValoraVida = layoutImagenValorarVida.inflate(R.layout.imagen, null);
+        final View vistaValoraVida = layoutImagenValorarVida.inflate(R.layout.imagenvv, null);
 
-        ivImagen = findViewById(R.id.ivImagenValoraVida);
+        //ivImagen.setBackgroundResource(R.drawable.sadp);
+        //ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.sadp));
+        //ivImagen.setImageResource(R.drawable.sadp);
 
         int valor = listaFragment.valorarVidaListaFragment();
+
+
         //Creamos un mensaje de alerta para informar al usuario
         AlertDialog.Builder dialogo = new AlertDialog.Builder(this);
 
         //Establecemos el título y el mensaje que queremos
         if (valor < 5) {
-            ivImagen.setBackgroundResource(R.drawable.sadp);
-            ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.sadp));
-            ivImagen.setImageResource(R.drawable.sadp);
+            String uri = "@drawable/sadp";
+            int imageResource = getResources().getIdentifier(uri, null, getPackageName());
+            Drawable imagen = ContextCompat.getDrawable(getApplicationContext(), imageResource);
+            ivImagen.setImageDrawable(imagen);
+            //ivImagen.setBackgroundResource(R.drawable.sadp);
+            //ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.sadp));
+            //ivImagen.setImageResource(R.drawable.sadp);
         } else if (valor >= 5 && valor <= 8) {
-            ivImagen.setBackgroundResource(R.drawable.neutrop);
-            ivImagen.setImageResource(R.drawable.neutrop);
-            ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.neutrop));
+            String uri = "@drawable/neutrop";
+            int imageResource = getResources().getIdentifier(uri, null, getPackageName());
+            Drawable imagen = ContextCompat.getDrawable(getApplicationContext(), imageResource);
+            ivImagen.setImageDrawable(imagen);
+            ((ImageView) findViewById(R.id.ivImagenVV)).setImageDrawable(imagen);
+            //ivImagen.setBackgroundResource(R.drawable.neutrop);
+            //ivImagen.setImageResource(R.drawable.neutrop);
+            //ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.neutrop));
         } else {
-            ivImagen.setBackgroundResource(R.drawable.smilep);
-            ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.smilep));
-            ivImagen.setImageResource(R.drawable.smilep);
+            String uri = "@drawable/smilep";
+            int imageResource = getResources().getIdentifier(uri, null, getPackageName());
+            Drawable imagen = ContextCompat.getDrawable(getApplicationContext(), imageResource);
+            ivImagen.setImageDrawable(imagen);
+            //ivImagen.setBackgroundResource(R.drawable.smilep);
+            //ivImagen.setImageDrawable(getResources().getDrawable(R.drawable.smilep));
+            //ivImagen.setImageResource(R.drawable.smilep);
         }
         //cargamos la vista del dialogo
         dialogo.setView(vistaValoraVida);
