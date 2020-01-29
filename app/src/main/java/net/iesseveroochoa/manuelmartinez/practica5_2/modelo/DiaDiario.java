@@ -102,6 +102,10 @@ public class DiaDiario implements Parcelable {
         this.longitud = longitud;
     }
 
+    public DiaDiario() {
+
+    }
+
     /**
      * para el item diario
      */

@@ -3,6 +3,7 @@ package net.iesseveroochoa.manuelmartinez.practica5_2.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -21,6 +22,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
+import com.google.gson.Gson;
 
 import net.iesseveroochoa.manuelmartinez.practica5_2.R;
 import net.iesseveroochoa.manuelmartinez.practica5_2.fragments.DiaFragment;
@@ -68,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Cargar el imagenView del dialogo valorar vida, asignar un valor por defecto----> error null pointer************************************************
         ivImagen = findViewById(R.id.ivImagenVV);
-//        ivImagen.setBackgroundResource(R.drawable.neutrop);
+        //ivImagen.setBackgroundResource(R.drawable.neutrop);
 
 
         //Orden actual de dias
@@ -83,12 +86,13 @@ public class MainActivity extends AppCompatActivity {
 
         if (frameContenedorDinamico != null) {
             esPantallaGrande = true;
+
         } else {
             esPantallaGrande = false;
 
         }
 
-        //Asignamos el evento de seleccion de correo
+        //Asignamos el evento de seleccion de un dia
         listaFragment.setOnListaDiarioListener(new ListaFragment.OnListaDiarioListener() {
             @Override
             public void onDiarioSeleccionado(DiaDiario dia) {
@@ -100,11 +104,56 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     //creamos el fragmento de forma dinámica
                     crearFragment(dia);
+                    recuperarUltimoDia();
 
                 }
             }
         });
 
+    }
+
+    /**
+     * Guardamos y Recuperamos el dia en las preferencias para que se muestre en pantalla grande al salir de la app
+     */
+
+    public void guardarUltimoDia() {
+        if (esPantallaGrande) {
+            DiaDiario dia = new DiaDiario();
+            SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
+            SharedPreferences.Editor prefsEditor = mPrefs.edit();
+            Gson gson = new Gson();
+            String json = gson.toJson(dia);
+            prefsEditor.putString("UltimoDia", json);
+            prefsEditor.commit();
+        }
+
+    }
+
+    public void recuperarUltimoDia() {
+        if (esPantallaGrande) {
+            SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
+            Gson gson = new Gson();
+            String json = mPrefs.getString("UltimoDia", "");
+            DiaDiario obj = gson.fromJson(json, DiaDiario.class);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        guardarUltimoDia();
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        guardarUltimoDia();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        recuperarUltimoDia();
     }
 
     /**
@@ -426,6 +475,5 @@ public class MainActivity extends AppCompatActivity {
         //Mostramos el dialogo
         dialogo.show();
     }
-
 
 }
